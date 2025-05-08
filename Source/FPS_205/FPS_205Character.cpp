@@ -54,12 +54,6 @@ AFPS_205Character::AFPS_205Character()
 
 
 
-
-// boxaim below 
-// (X=92.970770,Y=-0.622259,Z=59.703100)
-// (Pitch=-6.198173,Yaw=-12.499682,Roll=-2.647575)
-// (X=0.100000,Y=0.100000,Z=0.100000)
-
 	ConstructorHelpers::FClassFinder<AActor> WeaponClass(TEXT("/Game/Weapons/Shotgun/Shotgun_BP.Shotgun_BP_C")); // Finds the shotgun that will be equipped at the start.
 	if (WeaponClass.Class) {
 		
@@ -68,11 +62,10 @@ AFPS_205Character::AFPS_205Character()
 		Weapon->AttachToComponent(Mesh1P, FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("weapon_r_muzzle"));
 		Weapon->SetChildActorClass(WeaponClass.Class);
 		Weapon->SetRelativeLocation(FVector(-53.749861, 7.656388, -42.136484));
-		Weapon->SetRelativeRotation(FRotator(16.614693, -169.666971, 20.955306));
+		Weapon->SetRelativeRotation(FRotator(20.104953, -265.705765, -17.647796));
 		Weapon->SetWorldScale3D(FVector(0.500000, 0.500000, 0.500000));
 
-	
-
+	//	(Pitch = 20.104953, Yaw = -265.705765, Roll = -17.647796)
 	}
 
 	BoxAim = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxAim")); // This is where the gun will shoot from, where the sound will come from.
