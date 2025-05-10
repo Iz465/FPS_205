@@ -11,6 +11,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "DrawDebugHelpers.h" // Allows line trace to be seen.
+#include "Kismet/GameplayStatics.h"
 #include "Engine/LocalPlayer.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -70,8 +72,8 @@ AFPS_205Character::AFPS_205Character()
 
 	BoxAim = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxAim")); // This is where the gun will shoot from, where the sound will come from.
 	BoxAim->SetupAttachment(Weapon);
-	BoxAim->SetRelativeLocation(FVector(92.970770, -0.622259, 59.703100));
-	BoxAim->SetRelativeRotation(FRotator(-6.198173, -12.499682, -2.647575));
+	BoxAim->SetRelativeLocation(FVector(-0.050040, 92.949743, 61.420402));
+	BoxAim->SetRelativeRotation(FRotator(2.913176, 92.569598, 355.608232));
 	BoxAim->SetWorldScale3D(FVector(0.100000, 0.100000, 0.100000));
 
 }
@@ -106,11 +108,53 @@ void AFPS_205Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFPS_205Character::Look);
+
+
+		// Shooting
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AFPS_205Character::Shooting);
 	}
 	else
 	{
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
+}
+
+void AFPS_205Character::Shooting()
+{
+	// When the left mouse is clicked it fires the gun, uses the line trace and plays the gun sound.
+	if (canFire) {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, TEXT("Fired"));
+		canFire = false;
+		FVector StartLoc = BoxAim->GetComponentLocation();
+		FVector ForwardVector = BoxAim->GetForwardVector();
+		FVector EndLoc = ((ForwardVector * 1000.f) + StartLoc);
+		FHitResult TraceResult;
+		FCollisionQueryParams CollisionParams;
+
+	
+		bool TraceHit = GetWorld()->LineTraceSingleByChannel(TraceResult, StartLoc, EndLoc, ECC_Visibility);
+
+		if (TraceHit) {
+			DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Black, true, 1, 0, 5); // If it hits something
+		}
+		else {
+			DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Magenta, true, 1, 0, 5);
+		}
+
+
+		GunSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Weapons/Shotgun/shotgun_fire_exported_sound.shotgun_fire_exported_sound"));
+
+		if (GunSound) {
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), GunSound, BoxAim->GetComponentLocation());
+		}
+		GetWorldTimerManager().SetTimer(GunWait, [this]() // Sets up a timer so the gun can only fire every x seconds
+			{
+				canFire = true;
+			}, 1.5f, false);
+	}
+
+
+
 }
 
 

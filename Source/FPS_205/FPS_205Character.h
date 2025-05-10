@@ -46,6 +46,11 @@ class AFPS_205Character : public ACharacter
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
+
+	/** Shoot Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* ShootAction;
+
 	
 public:
 	AFPS_205Character();
@@ -72,5 +77,10 @@ public:
 	UChildActorComponent* Weapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBoxComponent* BoxAim; 
+	void Shooting();
+	bool canFire = true;
+	FTimerHandle GunWait;
+	USoundWave* GunSound;
+
 
 };
