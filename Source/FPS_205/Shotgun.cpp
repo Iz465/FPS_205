@@ -2,6 +2,7 @@
 
 
 #include "Shotgun.h"
+#include "WeaponsStruct.h"
 #include "Components/StaticMeshComponent.h"
 
 
@@ -20,13 +21,41 @@ AShotgun::AShotgun()
 		
 	}
 	
+	// All weapons are added to the struct to keep the information of them in one place
+	// Shotgun has its "isEquipped" bool set to true as its the weapon equipped at the start of the game.
+	WeaponsStruct shotgunWeapon;
+	shotgunWeapon.name = "Shotgun";
+	shotgunWeapon.fireRate = 1.5f;
+	shotgunWeapon.recoilRate = 1.5f;
+	shotgunWeapon.weaponAbility = "RapidFire";
+	shotgunWeapon.isEquipped = true;
+
+
+	bool checkArray = false;
+
+
+	for (WeaponsStruct& weapon : WeaponsArray)
+	{
+		if (weapon.name == "Shotgun") {
+			checkArray = true;
+		}
+	}
+	if (checkArray == false) {
+		WeaponsArray.Add(shotgunWeapon);
+	}
+
+
+
+
 	
+
 }
 
 // Called when the game starts or when spawned
 void AShotgun::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	
 }
 

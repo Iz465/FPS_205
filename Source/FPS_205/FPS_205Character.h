@@ -14,6 +14,7 @@ class UInputAction;
 class UInputMappingContext;
 class UChildActorComponent;
 class UBoxComponent;
+class UPlayer_AnimInstance;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -81,6 +82,8 @@ public:
 	bool canFire = true;
 	FTimerHandle GunWait;
 	USoundWave* GunSound;
+	UPlayer_AnimInstance* PlayerAnimInstance;
+
 
 
 };

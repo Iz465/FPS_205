@@ -2,7 +2,9 @@
 
 #include "FPS_205Character.h"
 #include "FPS_205Projectile.h"
+#include "WeaponsStruct.h"
 #include "Animation/AnimInstance.h"
+#include "Player_AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -131,7 +133,18 @@ void AFPS_205Character::Shooting()
 		FHitResult TraceResult;
 		FCollisionQueryParams CollisionParams;
 
-	
+		int number = 0;
+		for (const WeaponsStruct& weapon : WeaponsArray)
+		{
+		
+			number++;
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, TEXT("Weapon: ") + weapon.name);
+
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, TEXT("Ability: ") + weapon.weaponAbility);
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, FString::SanitizeFloat(number));
+		}
+
+
 		bool TraceHit = GetWorld()->LineTraceSingleByChannel(TraceResult, StartLoc, EndLoc, ECC_Visibility);
 
 		if (TraceHit) {
@@ -147,10 +160,25 @@ void AFPS_205Character::Shooting()
 		if (GunSound) {
 			UGameplayStatics::PlaySoundAtLocation(GetWorld(), GunSound, BoxAim->GetComponentLocation());
 		}
-		GetWorldTimerManager().SetTimer(GunWait, [this]() // Sets up a timer so the gun can only fire every x seconds
+
+
+		PlayerAnimInstance = Cast<UPlayer_AnimInstance>(GetMesh1P()->GetAnimInstance());
+
+		if (PlayerAnimInstance) {
+			PlayerAnimInstance->SetupRecoil(1.5f);
+		}
+		
+
+
+
+		// Sets up a timer so the gun can only fire every x seconds
+		GetWorldTimerManager().SetTimer(GunWait, [this]() 
 			{
 				canFire = true;
 			}, 1.5f, false);
+
+			
+
 	}
 
 
