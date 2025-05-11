@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "FPS_205Character.h"
+#include "GunCameraShake.h"
 #include "FPS_205Projectile.h"
 #include "WeaponsStruct.h"
 #include "Animation/AnimInstance.h"
@@ -168,6 +169,8 @@ void AFPS_205Character::Shooting()
 			PlayerAnimInstance->SetupRecoil(1.5f);
 		}
 		
+
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UGunCameraShake::StaticClass(), 1.0f);
 
 
 

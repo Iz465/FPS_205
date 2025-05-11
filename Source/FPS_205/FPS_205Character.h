@@ -15,6 +15,7 @@ class UInputMappingContext;
 class UChildActorComponent;
 class UBoxComponent;
 class UPlayer_AnimInstance;
+//class UGunCameraShake;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -83,6 +84,9 @@ public:
 	FTimerHandle GunWait;
 	USoundWave* GunSound;
 	UPlayer_AnimInstance* PlayerAnimInstance;
+
+	//UPROPERTY(EditAnywhere)
+	//TSubclassOf<UGunCameraShake> CamShake;
 
 
 
