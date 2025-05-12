@@ -4,6 +4,7 @@
 #include "GunCameraShake.h"
 #include "FPS_205Projectile.h"
 #include "WeaponsStruct.h"
+#include "WeaponsActorComponent.h"
 #include "Animation/AnimInstance.h"
 #include "Player_AnimInstance.h"
 #include "Camera/CameraComponent.h"
@@ -78,6 +79,8 @@ AFPS_205Character::AFPS_205Character()
 	BoxAim->SetRelativeLocation(FVector(-0.050040, 92.949743, 61.420402));
 	BoxAim->SetRelativeRotation(FRotator(2.913176, 92.569598, 355.608232));
 	BoxAim->SetWorldScale3D(FVector(0.100000, 0.100000, 0.100000));
+
+	WeaponsActorComponent = CreateDefaultSubobject<UWeaponsActorComponent>(TEXT("WeaponsActorComponent"));
 
 }
 
@@ -172,8 +175,18 @@ void AFPS_205Character::Shooting()
 
 		PlayerAnimInstance = Cast<UPlayer_AnimInstance>(GetMesh1P()->GetAnimInstance());
 
+		int recoilAmount = 0;
+		float fireRate = 0;
 		if (PlayerAnimInstance) {
-			PlayerAnimInstance->SetupRecoil(1.5f);
+			
+			for (const WeaponsStruct& weapon : WeaponsArray) {
+				if (weapon.isEquipped == true) {
+					recoilAmount = weapon.recoilRate;
+					fireRate = weapon.fireRate;
+				
+				}
+			}
+			PlayerAnimInstance->SetupRecoil(recoilAmount);
 		}
 		
 
@@ -185,10 +198,14 @@ void AFPS_205Character::Shooting()
 		GetWorldTimerManager().SetTimer(GunWait, [this]() 
 			{
 				canFire = true;
-			}, .4f, false);
+			}, fireRate, false);
 		// 1.5f for shotgun .4 for rifle;
 			
 
+	}
+
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, TEXT("Fire unavailable"));
 	}
 
 
@@ -201,9 +218,26 @@ void AFPS_205Character::EquipShotgun()
 	UClass* ShotgunClass = StaticLoadClass(AActor::StaticClass(), nullptr, TEXT("/Game/Weapons/Shotgun/Shotgun_BP.Shotgun_BP_C"));
 
 	if (ShotgunClass) {
+		canFire = true;
 		Weapon->SetChildActorClass(ShotgunClass);
+		WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::AirGun;
+		GetWorldTimerManager().SetTimer(GunWait, [this]() {
+			WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::Shotgun;
+			}, .1f, false);
+
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, TEXT("Shotgun Equipped"));
+		for (WeaponsStruct& weapon : WeaponsArray) {
+			if (weapon.name == "Shotgun") {
+				weapon.isEquipped = true;
+	
+			}
+			else {
+				weapon.isEquipped = false;
+		
+			}
+		}
 	}
+	
 }
 
 void AFPS_205Character::EquipRifle()
@@ -211,8 +245,26 @@ void AFPS_205Character::EquipRifle()
 	UClass* RifleClass = StaticLoadClass(AActor::StaticClass(), nullptr, TEXT("/Game/Weapons/Rifle/Rifle_BP.Rifle_BP_C"));
 
 	if (RifleClass) {
+		canFire = true;
 		Weapon->SetChildActorClass(RifleClass);
+		WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::AirGun;
+		GetWorldTimerManager().SetTimer(GunWait, [this]() {
+			WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::Rifle;
+			}, .1f, false);
+
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, TEXT("Rifle Equipped"));
+		for (WeaponsStruct& weapon : WeaponsArray) {
+			if (weapon.name == "Rifle") {
+				weapon.isEquipped = true;
+		
+			}
+			else {
+				weapon.isEquipped = false;
+	
+			}
+		}
+		
+
 	}
 } 
 	

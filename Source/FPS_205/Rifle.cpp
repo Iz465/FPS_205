@@ -27,7 +27,7 @@ ARifle::ARifle()
 	WeaponsStruct rifleWeapon;
 	rifleWeapon.name = "Rifle";
 	rifleWeapon.fireRate = .2f;
-	rifleWeapon.recoilRate = .5f;
+	rifleWeapon.recoilRate = 1.f;
 	rifleWeapon.weaponAbility = "RifleBeam";
 	rifleWeapon.isEquipped = false;
 

@@ -16,6 +16,7 @@ class UChildActorComponent;
 class UBoxComponent;
 class UPlayer_AnimInstance;
 class ARifle;
+class UWeaponsActorComponent;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -103,6 +104,7 @@ public:
 	FTimerHandle GunWait;
 	USoundWave* GunSound;
 	UPlayer_AnimInstance* PlayerAnimInstance;
+	UWeaponsActorComponent* WeaponsActorComponent;
 
 
 

@@ -7,6 +7,15 @@
 #include "WeaponsStruct.h"
 #include "WeaponsActorComponent.generated.h"
 
+UENUM(BlueprintType)
+enum class EWeaponsEnum : uint8
+{
+	Shotgun 	UMETA(DisplayName = "Shotgun"),
+	Rifle		UMETA(DisplayName = "Rifle"),
+	Pistol		UMETA(DisplayName = "Pistol"),
+	AirGun		UMETA(DisplayName = "AirGun")
+};
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class FPS_205_API UWeaponsActorComponent : public UActorComponent
@@ -26,7 +35,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	void SetupWeaponInputs(UInputComponent* PlayerInputComponent);
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EWeaponsEnum CurrentWeapon;
+	
 		
 
 
