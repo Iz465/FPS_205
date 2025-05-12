@@ -13,9 +13,11 @@ class FPS_205_API UWeaponsActorComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
+
 public:	
 	// Sets default values for this component's properties
 	UWeaponsActorComponent();
+
 
 protected:
 	// Called when the game starts
@@ -24,7 +26,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
+	void SetupWeaponInputs(UInputComponent* PlayerInputComponent);
+		
 
 
 		

@@ -11,6 +11,18 @@ ARifle::ARifle()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	
+
+	ConstructorHelpers::FObjectFinder<UStaticMesh> rifleMesh(TEXT("/Game/Weapons/Rifle/Rifle_Mesh.Rifle_Mesh"));
+	if (rifleMesh.Object) {
+		rifle = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Rifle"));
+		rifle->SetStaticMesh(rifleMesh.Object);
+		rifle->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		rifle->SetRelativeRotation(FRotator(0, -90, 0));
+		
+	
+	}
+
 
 	WeaponsStruct rifleWeapon;
 	rifleWeapon.name = "Rifle";
@@ -22,6 +34,7 @@ ARifle::ARifle()
 	bool checkArray = false;
 
 
+	// Makingb sure every weapon has unique name and id
 	for (WeaponsStruct& weapon : WeaponsArray)
 	{
 		if (weapon.name == "Rifle") {

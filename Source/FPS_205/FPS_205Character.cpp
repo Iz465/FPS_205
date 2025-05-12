@@ -112,9 +112,16 @@ void AFPS_205Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFPS_205Character::Look);
 
-
-		// Shooting
+		//// Shooting 
 		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AFPS_205Character::Shooting);
+
+		//Shotgun
+		EnhancedInputComponent->BindAction(ShotgunAction, ETriggerEvent::Started, this, &AFPS_205Character::EquipShotgun);
+
+		//Rifle 
+		EnhancedInputComponent->BindAction(RifleAction, ETriggerEvent::Started, this, &AFPS_205Character::EquipRifle);
+
+	
 	}
 	else
 	{
@@ -178,8 +185,8 @@ void AFPS_205Character::Shooting()
 		GetWorldTimerManager().SetTimer(GunWait, [this]() 
 			{
 				canFire = true;
-			}, 1.5f, false);
-
+			}, .4f, false);
+		// 1.5f for shotgun .4 for rifle;
 			
 
 	}
@@ -187,6 +194,30 @@ void AFPS_205Character::Shooting()
 
 
 }
+
+void AFPS_205Character::EquipShotgun()
+{
+	
+	UClass* ShotgunClass = StaticLoadClass(AActor::StaticClass(), nullptr, TEXT("/Game/Weapons/Shotgun/Shotgun_BP.Shotgun_BP_C"));
+
+	if (ShotgunClass) {
+		Weapon->SetChildActorClass(ShotgunClass);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, TEXT("Shotgun Equipped"));
+	}
+}
+
+void AFPS_205Character::EquipRifle()
+{
+	UClass* RifleClass = StaticLoadClass(AActor::StaticClass(), nullptr, TEXT("/Game/Weapons/Rifle/Rifle_BP.Rifle_BP_C"));
+
+	if (RifleClass) {
+		Weapon->SetChildActorClass(RifleClass);
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, TEXT("Rifle Equipped"));
+	}
+} 
+	
+
+
 
 
 void AFPS_205Character::Move(const FInputActionValue& Value)

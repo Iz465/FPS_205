@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "Rifle.generated.h"
 
+class UStaticMeshComponent;
+
 UCLASS()
 class FPS_205_API ARifle : public AActor
 {
@@ -22,5 +24,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+	UStaticMeshComponent* rifle;
 
 };

@@ -15,7 +15,7 @@ class UInputMappingContext;
 class UChildActorComponent;
 class UBoxComponent;
 class UPlayer_AnimInstance;
-//class UGunCameraShake;
+class ARifle;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -53,6 +53,23 @@ class AFPS_205Character : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ShootAction;
 
+	/** Shotgun Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* ShotgunAction;
+
+	/** Shotgun Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* RifleAction;
+
+	/** Shotgun Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* PistolAction;
+
+	/** Shotgun Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* AirGunAction;
+
+
 	
 public:
 	AFPS_205Character();
@@ -80,13 +97,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBoxComponent* BoxAim; 
 	void Shooting();
+	void EquipShotgun();
+	void EquipRifle();
 	bool canFire = true;
 	FTimerHandle GunWait;
 	USoundWave* GunSound;
 	UPlayer_AnimInstance* PlayerAnimInstance;
-
-	//UPROPERTY(EditAnywhere)
-	//TSubclassOf<UGunCameraShake> CamShake;
 
 
 
