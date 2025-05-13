@@ -19,22 +19,17 @@ protected:
 public:
     virtual void Tick(float DeltaTime) override;
 
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Monster")
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Monster")
     UMonsterStats* MonsterStats;
 
-    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Monster Runtime")
+    UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Health")
     float MonsterCurrentHealth;
 
-    // Functions
-    UFUNCTION(BlueprintCallable, Category = "Monster Actions")
+    void ApplyMonsterStats();
     void MonsterTakeDamage(float MonsterDamageAmount);
-
-    UFUNCTION(BlueprintCallable, Category = "Monster Actions")
     void MonsterAttack(AActor* Target);
-
-    UFUNCTION(BlueprintPure, Category = "Monster")
     bool IsMonsterDead() const;
 
-private:
-    void ApplyMonsterStats();
+    UFUNCTION(BlueprintCallable, Category = "Collision")
+    void OnMonsterCollisionWithPlayer(AActor* Player);
 };

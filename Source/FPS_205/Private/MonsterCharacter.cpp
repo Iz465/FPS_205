@@ -55,3 +55,8 @@ bool AMonsterCharacter::IsMonsterDead() const
 {
     return MonsterCurrentHealth <= 0.f;
 }
+
+void AMonsterCharacter::OnMonsterCollisionWithPlayer(AActor* Player)
+{
+    // Test
+}
