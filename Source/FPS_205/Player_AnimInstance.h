@@ -20,7 +20,7 @@ public:
 	UPlayer_AnimInstance();
 
 	UFUNCTION(BlueprintCallable)
-	void SetupRecoil(float recoilAmount);
+	void SetupRecoil(FVector RecoilLoc, FRotator RecoilRot);
 
 	UPROPERTY(BlueprintReadWrite)
 	FTransform Recoil;

@@ -10,14 +10,16 @@ UPlayer_AnimInstance::UPlayer_AnimInstance()
 
 }
 
-void UPlayer_AnimInstance::SetupRecoil(float recoilAmount)
+void UPlayer_AnimInstance::SetupRecoil(FVector RecoilLoc, FRotator RecoilRot)
 {
 	// how the gun will move when it shoots.
 	
-	 RecoilLocation = FVector(recoilAmount * -30, recoilAmount * -5, 0);
+	 RecoilLocation = RecoilLoc;
+
 
 	// how the gun will rotate when it shoots.
-	 RecoilRotation = FRotator(recoilAmount * 25, 0, 0);
+
+	 RecoilRotation = RecoilRot;
 
 	// parameter order is rotation then location then scale.
 	 RecoilTransform = FTransform(RecoilRotation, RecoilLocation);

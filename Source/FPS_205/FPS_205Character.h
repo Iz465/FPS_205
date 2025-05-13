@@ -16,6 +16,7 @@ class UChildActorComponent;
 class UBoxComponent;
 class UPlayer_AnimInstance;
 class ARifle;
+//class UClass;
 class UWeaponsActorComponent;
 struct FInputActionValue;
 
@@ -105,7 +106,7 @@ public:
 	USoundWave* GunSound;
 	UPlayer_AnimInstance* PlayerAnimInstance;
 	UWeaponsActorComponent* WeaponsActorComponent;
-
-
+	UFUNCTION(BlueprintCallable)
+	void EquipGun(UClass* GunClass, FString weaponName);
 
 };

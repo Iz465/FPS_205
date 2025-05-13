@@ -13,6 +13,8 @@ struct FPS_205_API WeaponsStruct
 	FString name;
 	float fireRate;
 	float recoilRate;
+	FVector recoilLoc;
+	FRotator recoilRot;
 	FString weaponAbility;
 	bool isEquipped;
 

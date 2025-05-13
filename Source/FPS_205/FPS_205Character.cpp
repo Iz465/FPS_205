@@ -159,7 +159,8 @@ void AFPS_205Character::Shooting()
 		bool TraceHit = GetWorld()->LineTraceSingleByChannel(TraceResult, StartLoc, EndLoc, ECC_Visibility);
 
 		if (TraceHit) {
-			DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Black, true, 1, 0, 5); // If it hits something
+			// If it hits something
+			DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Black, true, 1, 0, 5); 
 		}
 		else {
 			DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Magenta, true, 1, 0, 5);
@@ -175,22 +176,24 @@ void AFPS_205Character::Shooting()
 
 		PlayerAnimInstance = Cast<UPlayer_AnimInstance>(GetMesh1P()->GetAnimInstance());
 
-		int recoilAmount = 0;
+		FVector recoilLocation = FVector(0, 0, 0);
+		FRotator recoilRotation = FRotator(0, 0, 0);
 		float fireRate = 0;
 		if (PlayerAnimInstance) {
 			
 			for (const WeaponsStruct& weapon : WeaponsArray) {
 				if (weapon.isEquipped == true) {
-					recoilAmount = weapon.recoilRate;
+					recoilLocation = weapon.recoilLoc;
+					recoilRotation = weapon.recoilRot;
 					fireRate = weapon.fireRate;
 				
 				}
 			}
-			PlayerAnimInstance->SetupRecoil(recoilAmount);
+			PlayerAnimInstance->SetupRecoil(recoilLocation, recoilRotation);
 		}
 		
 
-		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UGunCameraShake::StaticClass(), 1.0f);
+	//	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UGunCameraShake::StaticClass(), 1.0f);
 
 
 
@@ -199,74 +202,57 @@ void AFPS_205Character::Shooting()
 			{
 				canFire = true;
 			}, fireRate, false);
+	
 		// 1.5f for shotgun .4 for rifle;
-			
-
+			// fireRate
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, FString::SanitizeFloat(fireRate));
 	}
 
 	else {
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, TEXT("Fire unavailable"));
 	}
-
-
-
 }
+ 
+ void AFPS_205Character::EquipGun(UClass* GunClass, FString weaponName) {
+	 if (GunClass) {
+		 canFire = true;
+		 Weapon->SetChildActorClass(GunClass);
+		 WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::AirGun;
+		 GetWorldTimerManager().SetTimer(GunWait, [this]() {
+			 WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::Shotgun;
+			 }, .1f, false);
 
+		 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, TEXT("Weapon Equipped"));
+		 for (WeaponsStruct& weapon : WeaponsArray) {
+			 if (weapon.name == weaponName) {
+				 weapon.isEquipped = true;
+
+			 }
+			 else {
+				 weapon.isEquipped = false;
+
+			 }
+		 }
+	 }
+ } 
+ 
 void AFPS_205Character::EquipShotgun()
 {
 	
 	UClass* ShotgunClass = StaticLoadClass(AActor::StaticClass(), nullptr, TEXT("/Game/Weapons/Shotgun/Shotgun_BP.Shotgun_BP_C"));
+	EquipGun(ShotgunClass, "Shotgun");
 
-	if (ShotgunClass) {
-		canFire = true;
-		Weapon->SetChildActorClass(ShotgunClass);
-		WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::AirGun;
-		GetWorldTimerManager().SetTimer(GunWait, [this]() {
-			WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::Shotgun;
-			}, .1f, false);
-
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, TEXT("Shotgun Equipped"));
-		for (WeaponsStruct& weapon : WeaponsArray) {
-			if (weapon.name == "Shotgun") {
-				weapon.isEquipped = true;
-	
-			}
-			else {
-				weapon.isEquipped = false;
-		
-			}
-		}
-	}
 	
 }
 
 void AFPS_205Character::EquipRifle()
 {
 	UClass* RifleClass = StaticLoadClass(AActor::StaticClass(), nullptr, TEXT("/Game/Weapons/Rifle/Rifle_BP.Rifle_BP_C"));
+	EquipGun(RifleClass, "Rifle");
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, TEXT("testing testing testing testing"));
+}
 
-	if (RifleClass) {
-		canFire = true;
-		Weapon->SetChildActorClass(RifleClass);
-		WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::AirGun;
-		GetWorldTimerManager().SetTimer(GunWait, [this]() {
-			WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::Rifle;
-			}, .1f, false);
 
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, TEXT("Rifle Equipped"));
-		for (WeaponsStruct& weapon : WeaponsArray) {
-			if (weapon.name == "Rifle") {
-				weapon.isEquipped = true;
-		
-			}
-			else {
-				weapon.isEquipped = false;
-	
-			}
-		}
-		
-
-	}
-} 
 	
 
 

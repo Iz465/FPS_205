@@ -26,15 +26,17 @@ ARifle::ARifle()
 
 	WeaponsStruct rifleWeapon;
 	rifleWeapon.name = "Rifle";
-	rifleWeapon.fireRate = .2f;
+	rifleWeapon.fireRate = .6f;
 	rifleWeapon.recoilRate = 1.f;
+	rifleWeapon.recoilLoc = FVector(rifleWeapon.recoilRate * -40, rifleWeapon.recoilRate * -5, 0);
+	rifleWeapon.recoilRot = FRotator(rifleWeapon.recoilRate * - 10, 0, 0);
 	rifleWeapon.weaponAbility = "RifleBeam";
 	rifleWeapon.isEquipped = false;
 
 	bool checkArray = false;
 
 
-	// Makingb sure every weapon has unique name and id
+	// Making sure every weapon has unique name and id
 	for (WeaponsStruct& weapon : WeaponsArray)
 	{
 		if (weapon.name == "Rifle") {
@@ -50,6 +52,7 @@ ARifle::ARifle()
 // Called when the game starts or when spawned
 void ARifle::BeginPlay()
 {
+	
 	Super::BeginPlay();
 	
 }
