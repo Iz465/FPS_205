@@ -71,7 +71,7 @@ AFPS_205Character::AFPS_205Character()
 		Weapon->SetRelativeRotation(FRotator(20.104953, -265.705765, -17.647796));
 		Weapon->SetWorldScale3D(FVector(0.500000, 0.500000, 0.500000));
 
-	//	(Pitch = 20.104953, Yaw = -265.705765, Roll = -17.647796)
+	
 	}
 
 	BoxAim = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxAim")); // This is where the gun will shoot from, where the sound will come from.
@@ -98,6 +98,15 @@ void AFPS_205Character::NotifyControllerChanged()
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
+}
+
+void AFPS_205Character::BeginPlay()
+{
+	Super::BeginPlay();
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("begin play is working"));
+//	speed = (target - start) / duration; // units per second
+
+
 }
 
 void AFPS_205Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -134,7 +143,7 @@ void AFPS_205Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AFPS_205Character::Shooting()
 {
-	// When the left mouse is clicked it fires the gun, uses the line trace and plays the gun sound.
+	// When the left mouse is clicked it fires the gun, uses the line trace and plays the gun sound, camera shake, gun recoil etc.
 	if (canFire) {
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, TEXT("Fired"));
 		canFire = false;
@@ -143,17 +152,6 @@ void AFPS_205Character::Shooting()
 		FVector EndLoc = ((ForwardVector * 1000.f) + StartLoc);
 		FHitResult TraceResult;
 		FCollisionQueryParams CollisionParams;
-
-		int number = 0;
-		for (const WeaponsStruct& weapon : WeaponsArray)
-		{
-		
-			number++;
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, TEXT("Weapon: ") + weapon.name);
-
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, TEXT("Ability: ") + weapon.weaponAbility);
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, FString::SanitizeFloat(number));
-		}
 
 
 		bool TraceHit = GetWorld()->LineTraceSingleByChannel(TraceResult, StartLoc, EndLoc, ECC_Visibility);
@@ -178,7 +176,8 @@ void AFPS_205Character::Shooting()
 
 		FVector recoilLocation = FVector(0, 0, 0);
 		FRotator recoilRotation = FRotator(0, 0, 0);
-		float fireRate = 0;
+		float fireRate = 0.f;
+		float cameraShake = 0.f;
 		if (PlayerAnimInstance) {
 			
 			for (const WeaponsStruct& weapon : WeaponsArray) {
@@ -186,6 +185,7 @@ void AFPS_205Character::Shooting()
 					recoilLocation = weapon.recoilLoc;
 					recoilRotation = weapon.recoilRot;
 					fireRate = weapon.fireRate;
+					cameraShake = weapon.CamShakeScale;
 				
 				}
 			}
@@ -193,9 +193,7 @@ void AFPS_205Character::Shooting()
 		}
 		
 
-	//	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UGunCameraShake::StaticClass(), 1.0f);
-
-
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UGunCameraShake::StaticClass(), cameraShake);
 
 		// Sets up a timer so the gun can only fire every x seconds
 		GetWorldTimerManager().SetTimer(GunWait, [this]() 
@@ -203,14 +201,9 @@ void AFPS_205Character::Shooting()
 				canFire = true;
 			}, fireRate, false);
 	
-		// 1.5f for shotgun .4 for rifle;
-			// fireRate
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, FString::SanitizeFloat(fireRate));
 	}
 
-	else {
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, TEXT("Fire unavailable"));
-	}
+	
 }
  
  void AFPS_205Character::EquipGun(UClass* GunClass, FString weaponName) {
@@ -222,11 +215,12 @@ void AFPS_205Character::Shooting()
 			 WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::Shotgun;
 			 }, .1f, false);
 
-		 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, TEXT("Weapon Equipped"));
+	
 		 for (WeaponsStruct& weapon : WeaponsArray) {
 			 if (weapon.name == weaponName) {
 				 weapon.isEquipped = true;
-
+				 Weapon->SetRelativeLocation(weapon.weaponLoc);
+				 Weapon->SetRelativeRotation(weapon.weaponRot);
 			 }
 			 else {
 				 weapon.isEquipped = false;
@@ -249,7 +243,7 @@ void AFPS_205Character::EquipRifle()
 {
 	UClass* RifleClass = StaticLoadClass(AActor::StaticClass(), nullptr, TEXT("/Game/Weapons/Rifle/Rifle_BP.Rifle_BP_C"));
 	EquipGun(RifleClass, "Rifle");
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, TEXT("testing testing testing testing"));
+	
 }
 
 
@@ -265,9 +259,16 @@ void AFPS_205Character::Move(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
+
 		// add movement 
 		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
 		AddMovementInput(GetActorRightVector(), MovementVector.X);
+		
+		UPlayer_AnimInstance* playerAnim = Cast<UPlayer_AnimInstance>(GetMesh1P()->GetAnimInstance());
+		if (playerAnim) {
+			playerAnim->GunMovementSway(GetMesh1P());
+		}
+		
 	}
 }
 

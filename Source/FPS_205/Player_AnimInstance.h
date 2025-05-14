@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
 #include "Engine/SkeletalMesh.h"
+#include "Logging/LogMacros.h"
 #include "Player_AnimInstance.generated.h"
 
 class USkeletalMesh;
@@ -21,6 +22,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetupRecoil(FVector RecoilLoc, FRotator RecoilRot);
+	void GunMovementSway(USkeletalMeshComponent* playerMesh);
 
 	UPROPERTY(BlueprintReadWrite)
 	FTransform Recoil;
@@ -28,6 +30,7 @@ public:
 	FTransform RecoilTransform;
 	FVector RecoilLocation;
 	FRotator RecoilRotation;
+	FVector WeaponLocation;
 
 protected:
 

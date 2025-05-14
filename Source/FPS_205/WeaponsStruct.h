@@ -16,6 +16,9 @@ struct FPS_205_API WeaponsStruct
 	FVector recoilLoc;
 	FRotator recoilRot;
 	FString weaponAbility;
+	FVector weaponLoc;
+	FRotator weaponRot;
+	float CamShakeScale;
 	bool isEquipped;
 
 };
