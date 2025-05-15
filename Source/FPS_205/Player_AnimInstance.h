@@ -22,8 +22,14 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SetupRecoil(FVector RecoilLoc, FRotator RecoilRot);
-	void GunMovementSway(USkeletalMeshComponent* playerMesh);
+	UFUNCTION(BlueprintCallable)
+	void ImplementRecoil(float deltaTime);
+	UFUNCTION(BlueprintCallable)
+	void SetupGunSway();
+	
 
+
+	// Variables for recoil
 	UPROPERTY(BlueprintReadWrite)
 	FTransform Recoil;
 	UPROPERTY(BlueprintReadWrite)
@@ -32,9 +38,27 @@ public:
 	FRotator RecoilRotation;
 	FVector WeaponLocation;
 
+	// Variables for gun sway
+	UPROPERTY(BlueprintReadWrite)
+	FTransform GunSwayTransform;
+	UPROPERTY(BlueprintReadWrite)
+	FTransform FinalGunSwayTransform;
+	float gunSwaySpeed = 0;
+	float gunSwayLocZ = 0;
+	float gunSwayRotX = 0;
+	float gunSwayRotZ = 0;
+	float finalGunSwayLocZ = 1;
+	float finalGunSwayRotX = 1.7;
+	float finalGunSwayRotZ = 0.5;
+	bool resetTransform = false;
+
+
+
 protected:
 
 private:
+	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+	
 	USkeletalMesh* animSkeleton;
 	
 	

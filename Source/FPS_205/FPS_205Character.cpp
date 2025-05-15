@@ -264,10 +264,10 @@ void AFPS_205Character::Move(const FInputActionValue& Value)
 		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
 		AddMovementInput(GetActorRightVector(), MovementVector.X);
 		
-		UPlayer_AnimInstance* playerAnim = Cast<UPlayer_AnimInstance>(GetMesh1P()->GetAnimInstance());
+		/*UPlayer_AnimInstance* playerAnim = Cast<UPlayer_AnimInstance>(GetMesh1P()->GetAnimInstance());
 		if (playerAnim) {
 			playerAnim->GunMovementSway(GetMesh1P());
-		}
+		} */
 		
 	}
 }
