@@ -105,6 +105,7 @@ public:
 	bool canFire = true;
 	FTimerHandle GunWait;
 	USoundWave* GunSound;
+	USoundWave* FleshSound;
 	UPlayer_AnimInstance* PlayerAnimInstance;
 	UWeaponsActorComponent* WeaponsActorComponent;
 	UFUNCTION(BlueprintCallable)

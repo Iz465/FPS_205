@@ -159,6 +159,11 @@ void AFPS_205Character::Shooting()
 		if (TraceHit) {
 			// If it hits something
 			DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Black, true, 1, 0, 5); 
+			AActor* HitActor = TraceResult.GetActor();
+			if (HitActor)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitActor->GetName());
+			}
 		}
 		else {
 			DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Magenta, true, 1, 0, 5);
@@ -166,9 +171,18 @@ void AFPS_205Character::Shooting()
 
 
 		GunSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Weapons/Shotgun/shotgun_fire_exported_sound.shotgun_fire_exported_sound"));
+		GunSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Sounds/Gun_Sounds/gun-shot-1-176892.gun-shot-1-176892"));
+		FleshSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Sounds/Flesh_Sounds/Bullet_Hitting_Flesh_finished.Bullet_Hitting_Flesh_finished"));
+	
 
 		if (GunSound) {
 			UGameplayStatics::PlaySoundAtLocation(GetWorld(), GunSound, BoxAim->GetComponentLocation());
+			
+			
+		}
+		if (FleshSound) {
+		   
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), FleshSound, EndLoc);
 		}
 
 
@@ -199,8 +213,8 @@ void AFPS_205Character::Shooting()
 		GetWorldTimerManager().SetTimer(GunWait, [this]() 
 			{
 				canFire = true;
-			}, fireRate, false);
-	
+			}, .2f, false);
+	//	fireRate
 	}
 
 	
@@ -210,17 +224,31 @@ void AFPS_205Character::Shooting()
 	 if (GunClass) {
 		 canFire = true;
 		 Weapon->SetChildActorClass(GunClass);
-		 WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::AirGun;
-		 GetWorldTimerManager().SetTimer(GunWait, [this]() {
-			 WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::Shotgun;
-			 }, .1f, false);
 
-	
 		 for (WeaponsStruct& weapon : WeaponsArray) {
 			 if (weapon.name == weaponName) {
 				 weapon.isEquipped = true;
+
 				 Weapon->SetRelativeLocation(weapon.weaponLoc);
 				 Weapon->SetRelativeRotation(weapon.weaponRot);
+				 Mesh1P->SetRelativeLocation(weapon.meshLoc); 
+				 Mesh1P->SetRelativeRotation(weapon.meshRot);
+
+				 WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::AirGun;
+		
+				 if (weapon.name == "Shotgun") {
+ 						GetWorldTimerManager().SetTimer(GunWait, [this]() {
+							WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::Shotgun;
+
+	 					}, .1f, false);	 
+				 }
+				 if (weapon.name == "Rifle") {	
+					 GetWorldTimerManager().SetTimer(GunWait, [this]() {
+						 WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::Rifle;
+
+						 }, .1f, false);
+				 }
+
 			 }
 			 else {
 				 weapon.isEquipped = false;

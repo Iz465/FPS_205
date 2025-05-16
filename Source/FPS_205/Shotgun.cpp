@@ -31,10 +31,11 @@ AShotgun::AShotgun()
 	shotgunWeapon.recoilRot = FRotator(shotgunWeapon.recoilRate * 25, 0, 0);
 	shotgunWeapon.weaponLoc = FVector(-53.749861, 7.656388, -42.136484);
 	shotgunWeapon.weaponRot = FRotator(20.104953, -265.705765, -17.647796);
+	shotgunWeapon.meshLoc = FVector(-15.656140, 17.940820, -147.398974);
+	shotgunWeapon.meshRot = FRotator(-0.000000, -19.783628, 0.000000);
 	shotgunWeapon.CamShakeScale = 1.f;
 	shotgunWeapon.weaponAbility = "RapidFire";
 	shotgunWeapon.isEquipped = true;
-
 	
 	bool checkArray = false;
 

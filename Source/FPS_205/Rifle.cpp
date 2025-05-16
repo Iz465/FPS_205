@@ -26,12 +26,14 @@ ARifle::ARifle()
 	// (Pitch=20.104953,Yaw=94.294235,Roll=-17.647796)
 	WeaponsStruct rifleWeapon;
 	rifleWeapon.name = "Rifle";
-	rifleWeapon.fireRate = .6f;
+	rifleWeapon.fireRate = .2f;
 	rifleWeapon.recoilRate = 0.6f;
 	rifleWeapon.recoilLoc = FVector(rifleWeapon.recoilRate * -20, rifleWeapon.recoilRate * -5, 0);
 	rifleWeapon.recoilRot = FRotator(rifleWeapon.recoilRate * - 10, 0, 0);
-	rifleWeapon.weaponLoc = FVector(-59.126104, 6.656548, -40.512461);
-	rifleWeapon.weaponRot = FRotator(20.104953, 94.294235, -17.647796);
+	rifleWeapon.weaponLoc = FVector(-69.113041, 6.829265, -36.745066);
+	rifleWeapon.weaponRot = FRotator(11.531901, -253.214561, -27.030231);
+	rifleWeapon.meshLoc = FVector(-29.200664, 21.189240, -146.543777);
+	rifleWeapon.meshRot = FRotator(-3.513471, -13.486668, -0.387453);
 	rifleWeapon.CamShakeScale = 0.1f;
 	rifleWeapon.weaponAbility = "RifleBeam";
 	rifleWeapon.isEquipped = false;
