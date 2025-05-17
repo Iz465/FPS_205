@@ -16,6 +16,7 @@ class UChildActorComponent;
 class UBoxComponent;
 class UPlayer_AnimInstance;
 class ARifle;
+class UNiagaraSystem;
 //class UClass;
 class UWeaponsActorComponent;
 struct FInputActionValue;
@@ -102,10 +103,12 @@ public:
 	void Shooting();
 	void EquipShotgun();
 	void EquipRifle();
+	UPROPERTY(BlueprintReadOnly)
 	bool canFire = true;
 	FTimerHandle GunWait;
 	USoundWave* GunSound;
 	USoundWave* FleshSound;
+	UNiagaraSystem* GunMuzzle;
 	UPlayer_AnimInstance* PlayerAnimInstance;
 	UWeaponsActorComponent* WeaponsActorComponent;
 	UFUNCTION(BlueprintCallable)

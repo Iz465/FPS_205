@@ -21,9 +21,7 @@ ARifle::ARifle()
 		
 	
 	}
-	// rifle loc and rot
-	// (X=-59.126104,Y=6.656548,Z=-40.512461) 
-	// (Pitch=20.104953,Yaw=94.294235,Roll=-17.647796)
+	
 	WeaponsStruct rifleWeapon;
 	rifleWeapon.name = "Rifle";
 	rifleWeapon.fireRate = .2f;
