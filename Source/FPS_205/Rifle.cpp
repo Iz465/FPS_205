@@ -2,6 +2,8 @@
 
 
 #include "Rifle.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "WeaponsStruct.h"
 
 
@@ -21,7 +23,7 @@ ARifle::ARifle()
 		
 	
 	}
-	
+	//GunSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Weapons/Shotgun/shotgun_fire_exported_sound.shotgun_fire_exported_sound"));
 	WeaponsStruct rifleWeapon;
 	rifleWeapon.name = "Rifle";
 	rifleWeapon.fireRate = .2f;
@@ -32,11 +34,14 @@ ARifle::ARifle()
 	rifleWeapon.weaponRot = FRotator(11.531901, -253.214561, -27.030231);
 	rifleWeapon.meshLoc = FVector(-29.200664, 21.189240, -146.543777);
 	rifleWeapon.meshRot = FRotator(-3.513471, -13.486668, -0.387453);
+	rifleWeapon.gunSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Sounds/Gun_Sounds/gun-shot-1-7069.gun-shot-1-7069"));
 	rifleWeapon.CamShakeScale = 0.1f;
+	rifleWeapon.gunMuzzle = LoadObject<UNiagaraSystem>(nullptr, TEXT("/Game/MuzzleFlash/MuzzleFlash/Niagara/NS_Rifle_Flash.NS_Rifle_Flash"));
 	rifleWeapon.weaponAbility = "RifleBeam";
 	rifleWeapon.isEquipped = false;
 
 	bool checkArray = false;
+
 
 
 	// Making sure every weapon has unique name and id

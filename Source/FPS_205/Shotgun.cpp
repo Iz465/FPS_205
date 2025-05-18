@@ -3,6 +3,8 @@
 
 #include "Shotgun.h"
 #include "WeaponsStruct.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Components/StaticMeshComponent.h"
 
 
@@ -33,7 +35,9 @@ AShotgun::AShotgun()
 	shotgunWeapon.weaponRot = FRotator(20.104953, -265.705765, -17.647796);
 	shotgunWeapon.meshLoc = FVector(-15.656140, 17.940820, -147.398974);
 	shotgunWeapon.meshRot = FRotator(-0.000000, -19.783628, 0.000000);
-	shotgunWeapon.CamShakeScale = 1.f;
+	shotgunWeapon.gunSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Weapons/Shotgun/shotgun_fire_exported_sound.shotgun_fire_exported_sound"));
+	shotgunWeapon.CamShakeScale = 1.f; 
+	shotgunWeapon.gunMuzzle = LoadObject<UNiagaraSystem>(nullptr, TEXT("/Game/MuzzleFlash/MuzzleFlash/Niagara/NS_Shotgun_Flash.NS_Shotgun_Flash"));
 	shotgunWeapon.weaponAbility = "RapidFire";
 	shotgunWeapon.isEquipped = true;
 	

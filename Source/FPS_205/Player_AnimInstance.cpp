@@ -47,7 +47,8 @@ void UPlayer_AnimInstance::ImplementRecoil(float deltaTime)
 void UPlayer_AnimInstance::SetupGunSway()
 {
 	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Blue, TEXT("Gun Sway Updating"));
-	gunSwaySpeed += 0.002;
+	// need to make this the same regardless of frames.
+	gunSwaySpeed += 0.01;
 
 	float locZ = FMath::Lerp(gunSwayLocZ, finalGunSwayLocZ, gunSwaySpeed);
 	float rotX = FMath::Lerp(gunSwayRotX, finalGunSwayRotX, gunSwaySpeed);

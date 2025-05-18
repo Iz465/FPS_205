@@ -16,8 +16,11 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "DrawDebugHelpers.h" // Allows line trace to be seen.
-#include "NiagaraSystem.h"
+#include "NiagaraSystem.h" // for spawning niagara VFX
 #include "NiagaraFunctionLibrary.h"
+#include "GeometryCacheActor.h" // for spawning geometry cache
+#include "GeometryCacheComponent.h"
+#include "GeometryCache.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/LocalPlayer.h"
 
@@ -155,7 +158,7 @@ void AFPS_205Character::Shooting()
 {
 	// When the left mouse is clicked it fires the gun, uses the line trace and plays the gun sound, camera shake, gun recoil etc.
 	if (canFire) {
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, TEXT("Fired"));
+
 		canFire = false;
 		FVector StartLoc = BoxAim->GetComponentLocation();
 		FVector ForwardVector = BoxAim->GetForwardVector();
@@ -163,50 +166,38 @@ void AFPS_205Character::Shooting()
 		FHitResult TraceResult;
 		FCollisionQueryParams CollisionParams;
 
-		UNiagaraSystem* RifleMuzzle = LoadObject<UNiagaraSystem>(nullptr, TEXT("/Game/MuzzleFlash/MuzzleFlash/Niagara/NS_Rifle_Flash.NS_Rifle_Flash"));
-		UNiagaraSystem* ShotgunMuzzle = LoadObject<UNiagaraSystem>(nullptr, TEXT("/Game/MuzzleFlash/MuzzleFlash/Niagara/NS_Shotgun_Flash.NS_Shotgun_Flash"));
-		
-	//	if (RifleMuzzle) {
-	
-		//	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), RifleMuzzle, BoxAim->GetComponentLocation(), BoxAim->GetForwardVector().Rotation(), FVector(1),
-		//		true, true, ENCPoolMethod::AutoRelease, true);
-	//	}
 		
 		bool TraceHit = GetWorld()->LineTraceSingleByChannel(TraceResult, StartLoc, EndLoc, ECC_Visibility);
 
 		if (TraceHit) {
 			// If it hits something
 		//	DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Black, true, 1, 0, 5); 
-			FleshSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Sounds/Flesh_Sounds/Bullet_Hitting_Flesh_finished.Bullet_Hitting_Flesh_finished"));
+		//	FleshSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Sounds/Flesh_Sounds/Bullet_Hitting_Flesh_finished.Bullet_Hitting_Flesh_finished"));
 			AActor* HitActor = TraceResult.GetActor();
 			if (HitActor)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Hit Actor: %s"), *HitActor->GetName());
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT("Hit is: ") + HitActor->GetName());
-				UGameplayStatics::PlaySoundAtLocation(GetWorld(), FleshSound, HitActor->GetActorLocation());
+				UGeometryCache* LoadedGeometryCache = LoadObject<UGeometryCache>(nullptr, TEXT("/Game/Blood_Splatter_03.Blood_Splatter_03"));
+				if (LoadedGeometryCache)
+				{
+					FVector SpawnLocation = TraceResult.ImpactPoint;
+					FRotator SpawnRotation = TraceResult.ImpactNormal.Rotation();
+
+					AGeometryCacheActor* SpawnedActor = GetWorld()->SpawnActor<AGeometryCacheActor>(SpawnLocation, SpawnRotation);
+					SpawnedActor->GetGeometryCacheComponent()->SetGeometryCache(LoadedGeometryCache);
+					SpawnedActor->GetGeometryCacheComponent()->Play();
+					SpawnedActor->SetActorScale3D(FVector(3, 3, 3));
+					SpawnedActor->SetLifeSpan(.5f);
+				}
+			//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT("Hit is: ") + HitActor->GetName());
+			//	UGameplayStatics::PlaySoundAtLocation(GetWorld(), FleshSound, HitActor->GetActorLocation());
 		
 		
-			}
+			} 
 		}
 		else {
 		//	DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Magenta, true, 1, 0, 5);
 		}
 
-
-//		GunSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Weapons/Shotgun/shotgun_fire_exported_sound.shotgun_fire_exported_sound"));
-//		GunSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Sounds/Gun_Sounds/gun-shot-1-176892.gun-shot-1-176892"));
-	//	FleshSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Sounds/Flesh_Sounds/Bullet_Hitting_Flesh_finished.Bullet_Hitting_Flesh_finished"));
-	
-
-//		if (GunSound) {
-	//		UGameplayStatics::PlaySoundAtLocation(GetWorld(), GunSound, BoxAim->GetComponentLocation());
-			
-			
-	//	}
-	//	if (FleshSound) {
-		   
-	//		UGameplayStatics::PlaySoundAtLocation(GetWorld(), FleshSound, EndLoc);
-	//	}
 
 
 		PlayerAnimInstance = Cast<UPlayer_AnimInstance>(GetMesh1P()->GetAnimInstance());
@@ -223,28 +214,22 @@ void AFPS_205Character::Shooting()
 					recoilRotation = weapon.recoilRot;
 					fireRate = weapon.fireRate;
 					cameraShake = weapon.CamShakeScale;
+					GunSound = weapon.gunSound;
+					GunMuzzle = weapon.gunMuzzle;
 					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("NAME IS: ") + weapon.name);
-					if (weapon.name == "Shotgun") {
-						GunSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Weapons/Shotgun/shotgun_fire_exported_sound.shotgun_fire_exported_sound"));
-						UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), ShotgunMuzzle, BoxAim->GetComponentLocation(), BoxAim->GetForwardVector().Rotation(), FVector(1),
-							true, true, ENCPoolMethod::AutoRelease, true);
-
-					}
-					if (weapon.name == "Rifle") {
-						GunSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Sounds/Gun_Sounds/gun-shot-1-7069.gun-shot-1-7069"));
-						GunSound->Volume = .1;
-						UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), RifleMuzzle, BoxAim->GetComponentLocation(), BoxAim->GetForwardVector().Rotation(), FVector(1),
-							true, true, ENCPoolMethod::AutoRelease, true);
-					
-					} 
-		
-					UGameplayStatics::PlaySoundAtLocation(GetWorld(), GunSound, BoxAim->GetComponentLocation());
-
+			
 				}
 			}
 			PlayerAnimInstance->SetupRecoil(recoilLocation, recoilRotation);
 		}
 		
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), GunSound, BoxAim->GetComponentLocation());
+
+		if (GunMuzzle) {
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), GunMuzzle, BoxAim->GetComponentLocation(), BoxAim->GetForwardVector().Rotation(), FVector(1),
+				true, true, ENCPoolMethod::AutoRelease, true);
+		}
+
 
 		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UGunCameraShake::StaticClass(), cameraShake);
 

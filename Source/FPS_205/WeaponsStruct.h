@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "CoreMinimal.h"
 
 /**
@@ -20,6 +22,8 @@ struct FPS_205_API WeaponsStruct
 	FRotator weaponRot;
 	FVector meshLoc;
 	FRotator meshRot;
+	USoundWave* gunSound;
+	UNiagaraSystem* gunMuzzle;
 	float CamShakeScale;
 	bool isEquipped;
 
