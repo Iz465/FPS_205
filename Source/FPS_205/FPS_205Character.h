@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "WeaponsStruct.h"
 #include "FPS_205Character.generated.h"
 
 class UInputComponent;
@@ -14,6 +15,10 @@ class UInputAction;
 class UInputMappingContext;
 class UChildActorComponent;
 class UBoxComponent;
+class UPlayer_AnimInstance;
+class ARifle;
+class UNiagaraSystem;
+class UWeaponsActorComponent;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -46,6 +51,28 @@ class AFPS_205Character : public ACharacter
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
+
+	/** Shoot Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* ShootAction;
+
+	/** Shotgun Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* ShotgunAction;
+
+	/** Shotgun Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* RifleAction;
+
+	/** Shotgun Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* PistolAction;
+
+	/** Shotgun Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* AirGunAction;
+
+
 	
 public:
 	AFPS_205Character();
@@ -60,6 +87,7 @@ protected:
 protected:
 	// APawn interface
 	virtual void NotifyControllerChanged() override;
+	virtual void BeginPlay();
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
 	// End of APawn interface
 
@@ -72,5 +100,17 @@ public:
 	UChildActorComponent* Weapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBoxComponent* BoxAim; 
+	void Shooting();
+	void EquipShotgun();
+	void EquipRifle();
+	void EquipPistol();
+	UPROPERTY(BlueprintReadOnly)
+	bool canFire = true;
+	FTimerHandle GunWait;
+	const WeaponsStruct* specificWeapon;
+	UPlayer_AnimInstance* PlayerAnimInstance;
+	UWeaponsActorComponent* WeaponsActorComponent;
+	UFUNCTION(BlueprintCallable)
+	void EquipGun(UClass* GunClass, FString weaponName);
 
 };

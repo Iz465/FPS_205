@@ -2,6 +2,9 @@
 
 
 #include "Shotgun.h"
+#include "WeaponsStruct.h"
+#include "NiagaraSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Components/StaticMeshComponent.h"
 
 
@@ -20,13 +23,50 @@ AShotgun::AShotgun()
 		
 	}
 	
+	// All weapons are added to the struct to keep the information of them in one place
+	// Shotgun has its "isEquipped" bool set to true as its the weapon equipped at the start of the game.
+	WeaponsStruct shotgunWeapon;
+	shotgunWeapon.name = "Shotgun";
+	shotgunWeapon.fireRate = 1.5f;
+	shotgunWeapon.recoilRate = 1.5f;
+	shotgunWeapon.recoilLoc = FVector(shotgunWeapon.recoilRate * -30, shotgunWeapon.recoilRate * -5, 0);
+	shotgunWeapon.recoilRot = FRotator(shotgunWeapon.recoilRate * 25, 0, 0);
+	shotgunWeapon.weaponLoc = FVector(-53.749861, 7.656388, -42.136484);
+	shotgunWeapon.weaponRot = FRotator(20.104953, -265.705765, -17.647796);
+	shotgunWeapon.meshLoc = FVector(-15.656140, 17.940820, -147.398974);
+	shotgunWeapon.meshRot = FRotator(-0.000000, -19.783628, 0.000000);
+	shotgunWeapon.gunSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Weapons/Shotgun/shotgun_fire_exported_sound.shotgun_fire_exported_sound"));
+	shotgunWeapon.CamShakeScale = 1.f; 
+	shotgunWeapon.gunMuzzle = LoadObject<UNiagaraSystem>(nullptr, TEXT("/Game/MuzzleFlash/MuzzleFlash/Niagara/NS_Shotgun_Flash.NS_Shotgun_Flash"));
+	shotgunWeapon.bloodScale = FVector(6, 6, 6);
+	shotgunWeapon.weaponAbility = "RapidFire";
+	shotgunWeapon.isEquipped = true;
 	
+	bool checkArray = false;
+
+
+	for (WeaponsStruct& weapon : WeaponsArray)
+	{
+		if (weapon.name == "Shotgun") {
+			checkArray = true;
+		}
+	}
+	if (checkArray == false) {
+		WeaponsArray.Add(shotgunWeapon);
+	}
+
+
+
+
+	
+
 }
 
 // Called when the game starts or when spawned
 void AShotgun::BeginPlay()
 {
 	Super::BeginPlay();
+	
 	
 }
 

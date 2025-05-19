@@ -1,8 +1,12 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "FPS_205Character.h"
+#include "GunCameraShake.h"
 #include "FPS_205Projectile.h"
+#include "WeaponsStruct.h"
+#include "WeaponsActorComponent.h"
 #include "Animation/AnimInstance.h"
+#include "Player_AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -11,6 +15,13 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "DrawDebugHelpers.h" // Allows line trace to be seen.
+#include "NiagaraSystem.h" // for spawning niagara VFX
+#include "NiagaraFunctionLibrary.h"
+#include "GeometryCacheActor.h" // for spawning geometry cache
+#include "GeometryCacheComponent.h"
+#include "GeometryCache.h"
+#include "Kismet/GameplayStatics.h"
 #include "Engine/LocalPlayer.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -65,14 +76,16 @@ AFPS_205Character::AFPS_205Character()
 		Weapon->SetRelativeRotation(FRotator(20.104953, -265.705765, -17.647796));
 		Weapon->SetWorldScale3D(FVector(0.500000, 0.500000, 0.500000));
 
-	//	(Pitch = 20.104953, Yaw = -265.705765, Roll = -17.647796)
+	
 	}
 
 	BoxAim = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxAim")); // This is where the gun will shoot from, where the sound will come from.
 	BoxAim->SetupAttachment(Weapon);
-	BoxAim->SetRelativeLocation(FVector(92.970770, -0.622259, 59.703100));
-	BoxAim->SetRelativeRotation(FRotator(-6.198173, -12.499682, -2.647575));
+	BoxAim->SetRelativeLocation(FVector(-0.050040, 92.949743, 61.420402));
+	BoxAim->SetRelativeRotation(FRotator(2.913176, 92.569598, 355.608232));
 	BoxAim->SetWorldScale3D(FVector(0.100000, 0.100000, 0.100000));
+
+	WeaponsActorComponent = CreateDefaultSubobject<UWeaponsActorComponent>(TEXT("WeaponsActorComponent"));
 
 }
 
@@ -92,6 +105,21 @@ void AFPS_205Character::NotifyControllerChanged()
 	}
 }
 
+void AFPS_205Character::BeginPlay()
+{
+	Super::BeginPlay();
+	for (WeaponsStruct& weapon : WeaponsArray) {
+		if (weapon.name == "Shotgun") {
+			weapon.isEquipped = true;
+		}
+		else {
+			weapon.isEquipped = false;
+		}
+	}
+
+
+}
+
 void AFPS_205Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {	
 	// Set up action bindings
@@ -106,12 +134,152 @@ void AFPS_205Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFPS_205Character::Look);
+
+		//// Shooting 
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AFPS_205Character::Shooting);
+
+		//Shotgun
+		EnhancedInputComponent->BindAction(ShotgunAction, ETriggerEvent::Started, this, &AFPS_205Character::EquipShotgun);
+
+		//Rifle 
+		EnhancedInputComponent->BindAction(RifleAction, ETriggerEvent::Started, this, &AFPS_205Character::EquipRifle);
+
+		//Pistol 
+		EnhancedInputComponent->BindAction(PistolAction, ETriggerEvent::Started, this, &AFPS_205Character::EquipPistol);
+
+	
 	}
 	else
 	{
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input Component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
 }
+
+
+// All gun things are played here like the sound, the animation, the recoil etc.
+void AFPS_205Character::Shooting()
+{
+	
+	if (!canFire) return;
+
+		canFire = false;
+
+		for (const WeaponsStruct& weapon : WeaponsArray) {
+			if (weapon.isEquipped == true) {
+				specificWeapon = &weapon;
+				break;
+			}
+		}
+
+		if (!specificWeapon) return;
+
+			PlayerAnimInstance = Cast<UPlayer_AnimInstance>(GetMesh1P()->GetAnimInstance());
+			if (!PlayerAnimInstance) return;
+
+			PlayerAnimInstance->SetupRecoil(specificWeapon->recoilLoc, specificWeapon->recoilRot);
+			
+
+			FVector StartLoc = BoxAim->GetComponentLocation();
+			FVector ForwardVector = BoxAim->GetForwardVector();
+			FVector EndLoc = ((ForwardVector * 5000.f) + StartLoc);
+			FHitResult TraceResult;
+		
+			bool TraceHit = GetWorld()->LineTraceSingleByChannel(TraceResult, StartLoc, EndLoc, ECC_Visibility);
+
+			if (TraceHit) {
+		
+				// if an actor is hit, then the blood splatter will appear where the actor was hit.
+				AActor* ActorHit = TraceResult.GetActor();
+				if (ActorHit)
+				{
+					UGeometryCache* BloodCache = LoadObject<UGeometryCache>(nullptr, TEXT("/Game/Blood_Splatter_03.Blood_Splatter_03"));
+					if (BloodCache)
+					{
+						FVector bloodLocation = TraceResult.ImpactPoint;
+						FRotator bloodRotation = TraceResult.ImpactNormal.Rotation();
+
+						AGeometryCacheActor* BloodSplatter = GetWorld()->SpawnActor<AGeometryCacheActor>(bloodLocation, bloodRotation);
+						BloodSplatter->GetGeometryCacheComponent()->SetGeometryCache(BloodCache);
+						BloodSplatter->GetGeometryCacheComponent()->Play();
+						BloodSplatter->SetActorScale3D(specificWeapon->bloodScale);
+						BloodSplatter->SetLifeSpan(.5f);
+					}
+				}
+			}
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), specificWeapon->gunSound, BoxAim->GetComponentLocation());
+
+			if (specificWeapon->gunMuzzle) {
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), specificWeapon->gunMuzzle, BoxAim->GetComponentLocation(), BoxAim->GetForwardVector().Rotation(), FVector(1),
+					true, true, ENCPoolMethod::AutoRelease, true);
+			}
+
+			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UGunCameraShake::StaticClass(), specificWeapon->CamShakeScale);
+
+			// Sets up a timer so the gun can only fire every x seconds
+			GetWorldTimerManager().SetTimer(GunWait, [this]()
+				{
+					canFire = true;
+				}, specificWeapon->fireRate, false);	
+}
+ 
+
+
+
+
+
+
+ void AFPS_205Character::EquipGun(UClass* GunClass, FString weaponName) {
+	 
+	 if (!GunClass) return;
+
+		 canFire = true;
+		 Weapon->SetChildActorClass(GunClass);
+
+		 for (WeaponsStruct& weapon : WeaponsArray) {
+			 if (weapon.name == weaponName) {
+				 weapon.isEquipped = true;
+
+				 Weapon->SetRelativeLocation(weapon.weaponLoc);
+				 Weapon->SetRelativeRotation(weapon.weaponRot);
+				 Mesh1P->SetRelativeLocation(weapon.meshLoc); 
+				 Mesh1P->SetRelativeRotation(weapon.meshRot);
+	
+				 if (EWeaponsEnum* EnumWeapon = WeaponsActorComponent->WeaponMap.Find(weaponName)) {
+					 WeaponsActorComponent->CurrentWeapon = *EnumWeapon;
+				 }
+			 }
+
+			 else {
+				 weapon.isEquipped = false;
+			 }
+		 }
+	 }
+ 
+ 
+void AFPS_205Character::EquipShotgun()
+{
+	UClass* ShotgunClass = StaticLoadClass(AActor::StaticClass(), nullptr, TEXT("/Game/Weapons/Shotgun/Shotgun_BP.Shotgun_BP_C"));
+	EquipGun(ShotgunClass, "Shotgun");
+}
+
+
+void AFPS_205Character::EquipRifle()
+{
+	UClass* RifleClass = StaticLoadClass(AActor::StaticClass(), nullptr, TEXT("/Game/Weapons/Rifle/Rifle_BP.Rifle_BP_C"));
+	EquipGun(RifleClass, "Rifle");
+}
+
+void AFPS_205Character::EquipPistol()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT("pistol keybind activated"));
+	UClass* PistolClass = StaticLoadClass(AActor::StaticClass(), nullptr, TEXT("/Game/Weapons/Pistol/Pistol_BP.Pistol_BP_C"));
+	EquipGun(PistolClass, "Pistol");
+} 
+
+
+	
+
+
 
 
 void AFPS_205Character::Move(const FInputActionValue& Value)
@@ -121,9 +289,16 @@ void AFPS_205Character::Move(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
+
 		// add movement 
 		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
 		AddMovementInput(GetActorRightVector(), MovementVector.X);
+		
+		/*UPlayer_AnimInstance* playerAnim = Cast<UPlayer_AnimInstance>(GetMesh1P()->GetAnimInstance());
+		if (playerAnim) {
+			playerAnim->GunMovementSway(GetMesh1P());
+		} */
+		
 	}
 }
 
