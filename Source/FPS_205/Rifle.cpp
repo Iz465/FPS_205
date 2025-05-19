@@ -4,6 +4,8 @@
 #include "Rifle.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "GeometryCacheActor.h" // for spawning geometry cache
+#include "GeometryCacheComponent.h"
 #include "WeaponsStruct.h"
 
 
@@ -37,6 +39,7 @@ ARifle::ARifle()
 	rifleWeapon.gunSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Sounds/Gun_Sounds/gun-shot-1-7069.gun-shot-1-7069"));
 	rifleWeapon.CamShakeScale = 0.1f;
 	rifleWeapon.gunMuzzle = LoadObject<UNiagaraSystem>(nullptr, TEXT("/Game/MuzzleFlash/MuzzleFlash/Niagara/NS_Rifle_Flash.NS_Rifle_Flash"));
+	rifleWeapon.bloodScale = FVector(3, 3, 3);
 	rifleWeapon.weaponAbility = "RifleBeam";
 	rifleWeapon.isEquipped = false;
 

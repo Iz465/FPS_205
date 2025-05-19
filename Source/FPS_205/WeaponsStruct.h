@@ -22,6 +22,7 @@ struct FPS_205_API WeaponsStruct
 	FRotator weaponRot;
 	FVector meshLoc;
 	FRotator meshRot;
+	FVector bloodScale;
 	USoundWave* gunSound;
 	UNiagaraSystem* gunMuzzle;
 	float CamShakeScale;

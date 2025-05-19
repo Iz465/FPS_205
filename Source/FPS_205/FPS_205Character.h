@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "WeaponsStruct.h"
 #include "FPS_205Character.generated.h"
 
 class UInputComponent;
@@ -17,7 +18,6 @@ class UBoxComponent;
 class UPlayer_AnimInstance;
 class ARifle;
 class UNiagaraSystem;
-//class UClass;
 class UWeaponsActorComponent;
 struct FInputActionValue;
 
@@ -103,12 +103,11 @@ public:
 	void Shooting();
 	void EquipShotgun();
 	void EquipRifle();
+	void EquipPistol();
 	UPROPERTY(BlueprintReadOnly)
 	bool canFire = true;
 	FTimerHandle GunWait;
-	USoundWave* GunSound;
-	USoundWave* FleshSound;
-	UNiagaraSystem* GunMuzzle;
+	const WeaponsStruct* specificWeapon;
 	UPlayer_AnimInstance* PlayerAnimInstance;
 	UWeaponsActorComponent* WeaponsActorComponent;
 	UFUNCTION(BlueprintCallable)

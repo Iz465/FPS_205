@@ -37,7 +37,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	EWeaponsEnum CurrentWeapon;
-	
+	TMap<FString, EWeaponsEnum> WeaponMap;
 		
 
 

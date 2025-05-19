@@ -117,8 +117,6 @@ void AFPS_205Character::BeginPlay()
 		}
 	}
 
-//	speed = (target - start) / duration; // units per second
-
 
 }
 
@@ -146,6 +144,9 @@ void AFPS_205Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		//Rifle 
 		EnhancedInputComponent->BindAction(RifleAction, ETriggerEvent::Started, this, &AFPS_205Character::EquipRifle);
 
+		//Pistol 
+		EnhancedInputComponent->BindAction(PistolAction, ETriggerEvent::Started, this, &AFPS_205Character::EquipPistol);
+
 	
 	}
 	else
@@ -154,98 +155,83 @@ void AFPS_205Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	}
 }
 
+
+// All gun things are played here like the sound, the animation, the recoil etc.
 void AFPS_205Character::Shooting()
 {
-	// When the left mouse is clicked it fires the gun, uses the line trace and plays the gun sound, camera shake, gun recoil etc.
-	if (canFire) {
+	
+	if (!canFire) return;
 
 		canFire = false;
-		FVector StartLoc = BoxAim->GetComponentLocation();
-		FVector ForwardVector = BoxAim->GetForwardVector();
-		FVector EndLoc = ((ForwardVector * 1000.f) + StartLoc);
-		FHitResult TraceResult;
-		FCollisionQueryParams CollisionParams;
 
+		for (const WeaponsStruct& weapon : WeaponsArray) {
+			if (weapon.isEquipped == true) {
+				specificWeapon = &weapon;
+				break;
+			}
+		}
+
+		if (!specificWeapon) return;
+
+			PlayerAnimInstance = Cast<UPlayer_AnimInstance>(GetMesh1P()->GetAnimInstance());
+			if (!PlayerAnimInstance) return;
+
+			PlayerAnimInstance->SetupRecoil(specificWeapon->recoilLoc, specificWeapon->recoilRot);
+			
+
+			FVector StartLoc = BoxAim->GetComponentLocation();
+			FVector ForwardVector = BoxAim->GetForwardVector();
+			FVector EndLoc = ((ForwardVector * 5000.f) + StartLoc);
+			FHitResult TraceResult;
 		
-		bool TraceHit = GetWorld()->LineTraceSingleByChannel(TraceResult, StartLoc, EndLoc, ECC_Visibility);
+			bool TraceHit = GetWorld()->LineTraceSingleByChannel(TraceResult, StartLoc, EndLoc, ECC_Visibility);
 
-		if (TraceHit) {
-			// If it hits something
-		//	DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Black, true, 1, 0, 5); 
-		//	FleshSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Sounds/Flesh_Sounds/Bullet_Hitting_Flesh_finished.Bullet_Hitting_Flesh_finished"));
-			AActor* HitActor = TraceResult.GetActor();
-			if (HitActor)
-			{
-				UGeometryCache* LoadedGeometryCache = LoadObject<UGeometryCache>(nullptr, TEXT("/Game/Blood_Splatter_03.Blood_Splatter_03"));
-				if (LoadedGeometryCache)
+			if (TraceHit) {
+		
+				// if an actor is hit, then the blood splatter will appear where the actor was hit.
+				AActor* ActorHit = TraceResult.GetActor();
+				if (ActorHit)
 				{
-					FVector SpawnLocation = TraceResult.ImpactPoint;
-					FRotator SpawnRotation = TraceResult.ImpactNormal.Rotation();
+					UGeometryCache* BloodCache = LoadObject<UGeometryCache>(nullptr, TEXT("/Game/Blood_Splatter_03.Blood_Splatter_03"));
+					if (BloodCache)
+					{
+						FVector bloodLocation = TraceResult.ImpactPoint;
+						FRotator bloodRotation = TraceResult.ImpactNormal.Rotation();
 
-					AGeometryCacheActor* SpawnedActor = GetWorld()->SpawnActor<AGeometryCacheActor>(SpawnLocation, SpawnRotation);
-					SpawnedActor->GetGeometryCacheComponent()->SetGeometryCache(LoadedGeometryCache);
-					SpawnedActor->GetGeometryCacheComponent()->Play();
-					SpawnedActor->SetActorScale3D(FVector(3, 3, 3));
-					SpawnedActor->SetLifeSpan(.5f);
-				}
-			//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT("Hit is: ") + HitActor->GetName());
-			//	UGameplayStatics::PlaySoundAtLocation(GetWorld(), FleshSound, HitActor->GetActorLocation());
-		
-		
-			} 
-		}
-		else {
-		//	DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Magenta, true, 1, 0, 5);
-		}
-
-
-
-		PlayerAnimInstance = Cast<UPlayer_AnimInstance>(GetMesh1P()->GetAnimInstance());
-
-		FVector recoilLocation = FVector(0, 0, 0);
-		FRotator recoilRotation = FRotator(0, 0, 0);
-		float fireRate = 0.f;
-		float cameraShake = 0.f;
-		if (PlayerAnimInstance) {
-			
-			for (const WeaponsStruct& weapon : WeaponsArray) {
-				if (weapon.isEquipped == true) {
-					recoilLocation = weapon.recoilLoc;
-					recoilRotation = weapon.recoilRot;
-					fireRate = weapon.fireRate;
-					cameraShake = weapon.CamShakeScale;
-					GunSound = weapon.gunSound;
-					GunMuzzle = weapon.gunMuzzle;
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("NAME IS: ") + weapon.name);
-			
+						AGeometryCacheActor* BloodSplatter = GetWorld()->SpawnActor<AGeometryCacheActor>(bloodLocation, bloodRotation);
+						BloodSplatter->GetGeometryCacheComponent()->SetGeometryCache(BloodCache);
+						BloodSplatter->GetGeometryCacheComponent()->Play();
+						BloodSplatter->SetActorScale3D(specificWeapon->bloodScale);
+						BloodSplatter->SetLifeSpan(.5f);
+					}
 				}
 			}
-			PlayerAnimInstance->SetupRecoil(recoilLocation, recoilRotation);
-		}
-		
-		UGameplayStatics::PlaySoundAtLocation(GetWorld(), GunSound, BoxAim->GetComponentLocation());
+			UGameplayStatics::PlaySoundAtLocation(GetWorld(), specificWeapon->gunSound, BoxAim->GetComponentLocation());
 
-		if (GunMuzzle) {
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), GunMuzzle, BoxAim->GetComponentLocation(), BoxAim->GetForwardVector().Rotation(), FVector(1),
-				true, true, ENCPoolMethod::AutoRelease, true);
-		}
+			if (specificWeapon->gunMuzzle) {
+				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), specificWeapon->gunMuzzle, BoxAim->GetComponentLocation(), BoxAim->GetForwardVector().Rotation(), FVector(1),
+					true, true, ENCPoolMethod::AutoRelease, true);
+			}
 
+			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UGunCameraShake::StaticClass(), specificWeapon->CamShakeScale);
 
-		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UGunCameraShake::StaticClass(), cameraShake);
-
-		// Sets up a timer so the gun can only fire every x seconds
-		GetWorldTimerManager().SetTimer(GunWait, [this]() 
-			{
-				canFire = true;
-			}, fireRate, false);
-	
-	}
-
-	
+			// Sets up a timer so the gun can only fire every x seconds
+			GetWorldTimerManager().SetTimer(GunWait, [this]()
+				{
+					canFire = true;
+				}, specificWeapon->fireRate, false);	
 }
  
+
+
+
+
+
+
  void AFPS_205Character::EquipGun(UClass* GunClass, FString weaponName) {
-	 if (GunClass) {
+	 
+	 if (!GunClass) return;
+
 		 canFire = true;
 		 Weapon->SetChildActorClass(GunClass);
 
@@ -257,51 +243,38 @@ void AFPS_205Character::Shooting()
 				 Weapon->SetRelativeRotation(weapon.weaponRot);
 				 Mesh1P->SetRelativeLocation(weapon.meshLoc); 
 				 Mesh1P->SetRelativeRotation(weapon.meshRot);
-
-				 WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::AirGun;
-		
-				 if (weapon.name == "Shotgun") {
- 						GetWorldTimerManager().SetTimer(GunWait, [this]() {
-							WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::Shotgun;
-						
-
-					
-
-	 					}, .1f, false);	 
+	
+				 if (EWeaponsEnum* EnumWeapon = WeaponsActorComponent->WeaponMap.Find(weaponName)) {
+					 WeaponsActorComponent->CurrentWeapon = *EnumWeapon;
 				 }
-				 if (weapon.name == "Rifle") {	
-					 GetWorldTimerManager().SetTimer(GunWait, [this]() {
-						 WeaponsActorComponent->CurrentWeapon = EWeaponsEnum::Rifle;
-			
-
-						 }, .1f, false);
-				 }
-				
-
 			 }
+
 			 else {
 				 weapon.isEquipped = false;
-
 			 }
 		 }
 	 }
- } 
+ 
  
 void AFPS_205Character::EquipShotgun()
 {
-	
 	UClass* ShotgunClass = StaticLoadClass(AActor::StaticClass(), nullptr, TEXT("/Game/Weapons/Shotgun/Shotgun_BP.Shotgun_BP_C"));
 	EquipGun(ShotgunClass, "Shotgun");
-
-	
 }
+
 
 void AFPS_205Character::EquipRifle()
 {
 	UClass* RifleClass = StaticLoadClass(AActor::StaticClass(), nullptr, TEXT("/Game/Weapons/Rifle/Rifle_BP.Rifle_BP_C"));
 	EquipGun(RifleClass, "Rifle");
-	
 }
+
+void AFPS_205Character::EquipPistol()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT("pistol keybind activated"));
+	UClass* PistolClass = StaticLoadClass(AActor::StaticClass(), nullptr, TEXT("/Game/Weapons/Pistol/Pistol_BP.Pistol_BP_C"));
+	EquipGun(PistolClass, "Pistol");
+} 
 
 
 	

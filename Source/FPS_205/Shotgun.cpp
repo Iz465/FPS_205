@@ -38,6 +38,7 @@ AShotgun::AShotgun()
 	shotgunWeapon.gunSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Weapons/Shotgun/shotgun_fire_exported_sound.shotgun_fire_exported_sound"));
 	shotgunWeapon.CamShakeScale = 1.f; 
 	shotgunWeapon.gunMuzzle = LoadObject<UNiagaraSystem>(nullptr, TEXT("/Game/MuzzleFlash/MuzzleFlash/Niagara/NS_Shotgun_Flash.NS_Shotgun_Flash"));
+	shotgunWeapon.bloodScale = FVector(6, 6, 6);
 	shotgunWeapon.weaponAbility = "RapidFire";
 	shotgunWeapon.isEquipped = true;
 	

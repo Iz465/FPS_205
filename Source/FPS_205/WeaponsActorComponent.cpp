@@ -12,6 +12,19 @@ UWeaponsActorComponent::UWeaponsActorComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 	CurrentWeapon = EWeaponsEnum::Shotgun;
+
+	// Fill map with string-enum pairs
+	//WeaponMap.Add("Shotgun", EWeaponsEnum::Shotgun);
+//	WeaponMap.Add("Rifle", EWeaponsEnum::Rifle);
+	//WeaponMap.Add("Pistol", EWeaponsEnum::Pistol);
+	//WeaponMap.Add("AirGun", EWeaponsEnum::AirGun);
+
+	WeaponMap.Add("Shotgun", EWeaponsEnum::Shotgun);
+	WeaponMap.Add("Rifle", EWeaponsEnum::Rifle);
+	WeaponMap.Add("Pistol", EWeaponsEnum::Pistol);
+	WeaponMap.Add("AirGun", EWeaponsEnum::AirGun);
+
+
 	// ...
 }
 
