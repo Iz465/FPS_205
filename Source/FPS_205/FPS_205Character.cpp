@@ -48,7 +48,7 @@ AFPS_205Character::AFPS_205Character()
 		Mesh1P->SetOnlyOwnerSee(true);
 		Mesh1P->SetupAttachment(FirstPersonCameraComponent);
 		Mesh1P->bCastDynamicShadow = false;
-		Mesh1P->CastShadow = false;
+		Mesh1P->CastShadow = false;  
 		Mesh1P->SetRelativeLocation(FVector(-15.656140, 17.940820, -147.398974));
 		Mesh1P->SetRelativeRotation(FRotator(-0.000000, -19.783628, 0.000000));
 		
@@ -179,8 +179,8 @@ void AFPS_205Character::Shooting()
 			PlayerAnimInstance->SetupRecoil(specificWeapon->recoilLoc, specificWeapon->recoilRot);
 			
 
-			FVector StartLoc = BoxAim->GetComponentLocation();
-			FVector ForwardVector = BoxAim->GetForwardVector();
+			FVector StartLoc = FirstPersonCameraComponent->GetComponentLocation();
+			FVector ForwardVector = FirstPersonCameraComponent->GetForwardVector();
 			FVector EndLoc = ((ForwardVector * 5000.f) + StartLoc);
 			FHitResult TraceResult;
 		

@@ -25,17 +25,17 @@ APistol::APistol()
 		
 		WeaponsStruct PistolWeapon;
 		PistolWeapon.name = "Pistol";
-		PistolWeapon.fireRate = 0.5f;
-		PistolWeapon.recoilRate = 1.f;
+		PistolWeapon.fireRate = 0.5f; 
+		PistolWeapon.recoilRate = 1.f; 
 		PistolWeapon.recoilLoc = FVector(PistolWeapon.recoilRate * -30, PistolWeapon.recoilRate * -5, 0);
 		PistolWeapon.recoilRot = FRotator(PistolWeapon.recoilRate * 25, 0, 0);
-		PistolWeapon.weaponLoc = FVector(-53.749861, 7.656388, -42.136484);
-		PistolWeapon.weaponRot = FRotator(20.104953, -265.705765, -17.647796);
-		PistolWeapon.meshLoc = FVector(-15.656140, 17.940820, -147.398974);
-		PistolWeapon.meshRot = FRotator(-0.000000, -19.783628, 0.000000);
-		PistolWeapon.gunSound = LoadObject<USoundWave>(nullptr, TEXT(""));
-		PistolWeapon.CamShakeScale = 0.2f;
-		PistolWeapon.gunMuzzle = LoadObject<UNiagaraSystem>(nullptr, TEXT(""));
+		PistolWeapon.weaponLoc = FVector(-66.233594, 2.383527, -29.492753);
+		PistolWeapon.weaponRot = FRotator(17.830860, 96.242544, -19.460437);
+		PistolWeapon.meshLoc = FVector(-23.135406, 37.212458, -143.116496);
+		PistolWeapon.meshRot = FRotator(1.002553, 0.563082, -0.510769);
+		PistolWeapon.gunSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Sounds/Gun_Sounds/pistol_gun_sound.pistol_gun_sound"));
+		PistolWeapon.CamShakeScale = 0.2f; 
+		PistolWeapon.gunMuzzle = LoadObject<UNiagaraSystem>(nullptr, TEXT("/Game/MuzzleFlash/MuzzleFlash/Niagara/NS_Rifle_Flash.NS_Rifle_Flash"));
 		PistolWeapon.bloodScale = FVector(3, 3, 3);
 		PistolWeapon.weaponAbility = "TestAbility";
 		PistolWeapon.isEquipped = false;
@@ -69,3 +69,12 @@ void APistol::Tick(float DeltaTime)
 
 }
 
+/*
+* 
+* old rotation/ location in case i want to switch back to this one.
+	PistolWeapon.weaponLoc = FVector(-65.756018, 1.757550, -31.527866);
+		PistolWeapon.weaponRot = FRotator(23.375090, 107.144062, -12.869051);
+		PistolWeapon.meshLoc = FVector(-33.758897, 35.569133, -142.992237);
+		PistolWeapon.meshRot = FRotator(0.897862, -6.448737, 0.776268);
+
+*/
