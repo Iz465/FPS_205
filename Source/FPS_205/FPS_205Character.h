@@ -60,17 +60,22 @@ class AFPS_205Character : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ShotgunAction;
 
-	/** Shotgun Input Action */
+	/** Rifle Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* RifleAction;
 
-	/** Shotgun Input Action */
+	/** Pistol Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* PistolAction;
 
-	/** Shotgun Input Action */
+	/** Airgun Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* AirGunAction;
+
+	/** Weapon Ability Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* WeaponAbilityAction;
+
 
 
 	
@@ -106,11 +111,17 @@ public:
 	void EquipPistol();
 	UPROPERTY(BlueprintReadOnly)
 	bool canFire = true;
+	bool canFireAbility = true;
 	FTimerHandle GunWait;
+	FTimerHandle ShotgunWait;
+	FTimerHandle RifleWait;
+	FTimerHandle PistolWait;
+	FTimerHandle AbilityWait;
 	const WeaponsStruct* specificWeapon;
 	UPlayer_AnimInstance* PlayerAnimInstance;
 	UWeaponsActorComponent* WeaponsActorComponent;
 	UFUNCTION(BlueprintCallable)
 	void EquipGun(UClass* GunClass, FString weaponName);
+	void CastAbility();
 
 };

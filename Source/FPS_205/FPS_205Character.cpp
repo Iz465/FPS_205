@@ -147,6 +147,9 @@ void AFPS_205Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		//Pistol 
 		EnhancedInputComponent->BindAction(PistolAction, ETriggerEvent::Started, this, &AFPS_205Character::EquipPistol);
 
+		// Weapon Ability
+		EnhancedInputComponent->BindAction(WeaponAbilityAction, ETriggerEvent::Started, this, &AFPS_205Character::CastAbility);
+
 	
 	}
 	else
@@ -232,19 +235,22 @@ void AFPS_205Character::Shooting()
 	 
 	 if (!GunClass) return;
 
-		 canFire = true;
 		 Weapon->SetChildActorClass(GunClass);
 
-		 for (WeaponsStruct& weapon : WeaponsArray) {
-			 if (weapon.name == weaponName) {
+		 for (WeaponsStruct& weapon : WeaponsArray) 
+		 {
+			 if (weapon.name == weaponName) 
+			 {
 				 weapon.isEquipped = true;
 
 				 Weapon->SetRelativeLocation(weapon.weaponLoc);
 				 Weapon->SetRelativeRotation(weapon.weaponRot);
 				 Mesh1P->SetRelativeLocation(weapon.meshLoc); 
 				 Mesh1P->SetRelativeRotation(weapon.meshRot);
-	
-				 if (EWeaponsEnum* EnumWeapon = WeaponsActorComponent->WeaponMap.Find(weaponName)) {
+					
+				 // switches weapon animation to corresponding weapon.
+				 if (EWeaponsEnum* EnumWeapon = WeaponsActorComponent->WeaponMap.Find(weaponName)) 
+				 {
 					 WeaponsActorComponent->CurrentWeapon = *EnumWeapon;
 				 }
 			 }
@@ -254,6 +260,24 @@ void AFPS_205Character::Shooting()
 			 }
 		 }
 	 }
+
+ void AFPS_205Character::CastAbility()
+ {
+	 if (!canFireAbility) return;
+	 canFireAbility = false;
+	 for (WeaponsStruct& weapon : WeaponsArray) {
+		 if (weapon.isEquipped == true) {
+			 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, weapon.weaponAbility);
+		 }
+
+		 GetWorldTimerManager().SetTimer(AbilityWait, [this]()
+			 {
+				 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Ability Reset"));
+				 canFireAbility = true;
+			 }, 15.f, false);
+	 }
+
+ }
  
  
 void AFPS_205Character::EquipShotgun()
