@@ -4,6 +4,8 @@
 #include "GunCameraShake.h"
 #include "FPS_205Projectile.h"
 #include "WeaponsStruct.h"
+#include "Shotgun.h"
+#include "Rifle.h"
 #include "WeaponsActorComponent.h"
 #include "Animation/AnimInstance.h"
 #include "Player_AnimInstance.h"
@@ -23,6 +25,7 @@
 #include "GeometryCache.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/LocalPlayer.h"
+#include "Pistol.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -268,8 +271,24 @@ void AFPS_205Character::Shooting()
 	 for (WeaponsStruct& weapon : WeaponsArray) {
 		 if (weapon.isEquipped == true) {
 			 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, weapon.weaponAbility);
+			 AShotgun* shotgunClass = Cast<AShotgun>(Weapon->GetChildActor());
+			 ARifle* rifleClass = Cast<ARifle>(Weapon->GetChildActor());
+			 APistol* pistolClass = Cast<APistol>(Weapon->GetChildActor());
+			 if (shotgunClass) {
+				 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("calling shotgun function"));
+				 shotgunClass->WeaponAbility();
+			 }
+			 if (rifleClass) {
+				 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Purple, TEXT("calling rifle function"));
+				 rifleClass->WeaponAbility();
+			 }
+			 if (pistolClass) {
+				 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("calling pistol function"));
+				 pistolClass->WeaponAbility();
+			 }
+			 
 		 }
-
+	
 		 GetWorldTimerManager().SetTimer(AbilityWait, [this]()
 			 {
 				 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Ability Reset"));
@@ -313,16 +332,9 @@ void AFPS_205Character::Move(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
-
 		// add movement 
 		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
-		AddMovementInput(GetActorRightVector(), MovementVector.X);
-		
-		/*UPlayer_AnimInstance* playerAnim = Cast<UPlayer_AnimInstance>(GetMesh1P()->GetAnimInstance());
-		if (playerAnim) {
-			playerAnim->GunMovementSway(GetMesh1P());
-		} */
-		
+		AddMovementInput(GetActorRightVector(), MovementVector.X);	
 	}
 }
 

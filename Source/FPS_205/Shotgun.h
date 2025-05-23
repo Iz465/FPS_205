@@ -26,5 +26,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* Shotgun;
+	virtual void WeaponAbility();
 
 };

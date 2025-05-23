@@ -75,3 +75,7 @@ void ARifle::Tick(float DeltaTime)
 
 }
 
+void ARifle::WeaponAbility()
+{
+}
+

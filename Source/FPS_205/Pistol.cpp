@@ -69,6 +69,12 @@ void APistol::Tick(float DeltaTime)
 
 }
 
+void APistol::WeaponAbility()
+{
+}
+
+
+
 /*
 * 
 * old rotation/ location in case i want to switch back to this one.

@@ -5,6 +5,7 @@
 #include "WeaponsStruct.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Player_AnimInstance.h"
 #include "Components/StaticMeshComponent.h"
 
 
@@ -75,5 +76,11 @@ void AShotgun::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void AShotgun::WeaponAbility()
+{
+	
+	GEngine->AddOnScreenDebugMessage(01, 5.f, FColor::Emerald, TEXT("Starting shotgun ability"));
 }
 
