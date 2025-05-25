@@ -4,6 +4,7 @@
 #include "Shotgun.h"
 #include "WeaponsStruct.h"
 #include "NiagaraSystem.h"
+#include "FPS_205Character.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Player_AnimInstance.h"
 #include "Components/StaticMeshComponent.h"
@@ -41,6 +42,7 @@ AShotgun::AShotgun()
 	shotgunWeapon.gunMuzzle = LoadObject<UNiagaraSystem>(nullptr, TEXT("/Game/MuzzleFlash/MuzzleFlash/Niagara/NS_Shotgun_Flash.NS_Shotgun_Flash"));
 	shotgunWeapon.bloodScale = FVector(6, 6, 6);
 	shotgunWeapon.weaponAbility = "RapidFire";
+	shotgunWeapon.abilityCooldown = 15.f;
 	shotgunWeapon.isEquipped = true;
 	
 	bool checkArray = false;
@@ -55,12 +57,6 @@ AShotgun::AShotgun()
 	if (checkArray == false) {
 		WeaponsArray.Add(shotgunWeapon);
 	}
-
-
-
-
-	
-
 }
 
 // Called when the game starts or when spawned
@@ -78,9 +74,34 @@ void AShotgun::Tick(float DeltaTime)
 
 }
 
-void AShotgun::WeaponAbility()
+void AShotgun::WeaponAbility(USkeletalMeshComponent* playerMesh, const WeaponsStruct& shotgunWeapon)
 {
 	
-	GEngine->AddOnScreenDebugMessage(01, 5.f, FColor::Emerald, TEXT("Starting shotgun ability"));
+	player = Cast<AFPS_205Character>(playerMesh->GetOwner());
+
+	for (int i = 0; i <= 5; i++)
+	{
+		FTimerHandle abilityTimer;
+		
+		delay = (i - 1) * .1f; 
+
+		if (!player) return;
+		if (i == 1)
+			player->Shooting(true);
+
+		GetWorldTimerManager().SetTimer(abilityTimer, [this, shotgunWeapon, i]()
+			{
+				
+				if (i > 1) {
+					player->Shooting(true);
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::SanitizeFloat(i));
+					count++;
+				}
+			}, delay, false);
+
+	}
+
+
+
 }
 

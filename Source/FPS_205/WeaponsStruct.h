@@ -15,6 +15,7 @@ struct FPS_205_API WeaponsStruct
 	FString name;
 	float fireRate;
 	float recoilRate;
+	float abilityCooldown;
 	FVector recoilLoc;
 	FRotator recoilRot;
 	FString weaponAbility;

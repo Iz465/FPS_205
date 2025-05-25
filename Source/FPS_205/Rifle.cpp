@@ -4,6 +4,7 @@
 #include "Rifle.h"
 #include "NiagaraSystem.h"
 #include "NiagaraFunctionLibrary.h"
+#include "FPS_205Character.h"
 #include "GeometryCacheActor.h" // for spawning geometry cache
 #include "GeometryCacheComponent.h"
 #include "WeaponsStruct.h"
@@ -41,6 +42,7 @@ ARifle::ARifle()
 	rifleWeapon.gunMuzzle = LoadObject<UNiagaraSystem>(nullptr, TEXT("/Game/MuzzleFlash/MuzzleFlash/Niagara/NS_Rifle_Flash.NS_Rifle_Flash"));
 	rifleWeapon.bloodScale = FVector(3, 3, 3);
 	rifleWeapon.weaponAbility = "RifleBeam";
+	rifleWeapon.abilityCooldown = 20.f;
 	rifleWeapon.isEquipped = false;
 
 	bool checkArray = false;
@@ -75,7 +77,28 @@ void ARifle::Tick(float DeltaTime)
 
 }
 
+void ARifle::activateMultiShot(USkeletalMeshComponent* playerMesh)
+{
+	multiShotFired = true;
+	AFPS_205Character* player = Cast<AFPS_205Character>(playerMesh->GetOwner());
+	player->makeMuzzle(0);
+	player->makeMuzzle(-20);
+	player->makeMuzzle(20);
+	multiShotFired = false;
+	
+
+}
+
 void ARifle::WeaponAbility()
 {
+	multiShot = true;
+	GEngine->AddOnScreenDebugMessage(-1, 5.F, FColor::Orange, TEXT("Multi Shot"));
+
+	GetWorldTimerManager().SetTimer(rifleTimer, [this] 
+		{
+		multiShot = false;
+		}, 5.f, false);
+	
 }
+
 

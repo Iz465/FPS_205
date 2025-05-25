@@ -7,6 +7,7 @@
 #include "Rifle.generated.h"
 
 class UStaticMeshComponent;
+class USkeletalMeshComponent;
 
 UCLASS()
 class FPS_205_API ARifle : public AActor
@@ -26,6 +27,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UStaticMeshComponent* rifle;
+	FTimerHandle rifleTimer;
+	bool multiShot = false;
+	bool multiShotFired = false;
+	void activateMultiShot(USkeletalMeshComponent* playerMesh);
 	virtual void WeaponAbility();
 
 };

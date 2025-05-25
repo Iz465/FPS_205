@@ -139,7 +139,7 @@ void AFPS_205Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFPS_205Character::Look);
 
 		//// Shooting 
-		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AFPS_205Character::Shooting);
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AFPS_205Character::ShootingInput);
 
 		//Shotgun
 		EnhancedInputComponent->BindAction(ShotgunAction, ETriggerEvent::Started, this, &AFPS_205Character::EquipShotgun);
@@ -163,11 +163,10 @@ void AFPS_205Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 
 // All gun things are played here like the sound, the animation, the recoil etc.
-void AFPS_205Character::Shooting()
+void AFPS_205Character::Shooting(bool abilityFire)
 {
-	
+	if (abilityFire == true) canFire = true;
 	if (!canFire) return;
-
 		canFire = false;
 
 		for (const WeaponsStruct& weapon : WeaponsArray) {
@@ -185,12 +184,7 @@ void AFPS_205Character::Shooting()
 			PlayerAnimInstance->SetupRecoil(specificWeapon->recoilLoc, specificWeapon->recoilRot);
 			
 
-			FVector StartLoc = FirstPersonCameraComponent->GetComponentLocation();
-			FVector ForwardVector = FirstPersonCameraComponent->GetForwardVector();
-			FVector EndLoc = ((ForwardVector * 5000.f) + StartLoc);
-			FHitResult TraceResult;
-		
-			bool TraceHit = GetWorld()->LineTraceSingleByChannel(TraceResult, StartLoc, EndLoc, ECC_Visibility);
+			bool TraceHit = makeTrace();
 
 			if (TraceHit) {
 		
@@ -212,12 +206,10 @@ void AFPS_205Character::Shooting()
 					}
 				}
 			}
+
 			UGameplayStatics::PlaySoundAtLocation(GetWorld(), specificWeapon->gunSound, BoxAim->GetComponentLocation());
 
-			if (specificWeapon->gunMuzzle) {
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), specificWeapon->gunMuzzle, BoxAim->GetComponentLocation(), BoxAim->GetForwardVector().Rotation(), FVector(1),
-					true, true, ENCPoolMethod::AutoRelease, true);
-			}
+			makeMuzzle(0);
 
 			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UGunCameraShake::StaticClass(), specificWeapon->CamShakeScale);
 
@@ -227,11 +219,13 @@ void AFPS_205Character::Shooting()
 					canFire = true;
 				}, specificWeapon->fireRate, false);	
 }
+
+
+void AFPS_205Character::ShootingInput()
+{
+	Shooting(false);
+}
  
-
-
-
-
 
 
  void AFPS_205Character::EquipGun(UClass* GunClass, FString weaponName) {
@@ -265,7 +259,7 @@ void AFPS_205Character::Shooting()
 	 }
 
  void AFPS_205Character::CastAbility()
- {
+ { 
 	 if (!canFireAbility) return;
 	 canFireAbility = false;
 	 for (WeaponsStruct& weapon : WeaponsArray) {
@@ -276,7 +270,7 @@ void AFPS_205Character::Shooting()
 			 APistol* pistolClass = Cast<APistol>(Weapon->GetChildActor());
 			 if (shotgunClass) {
 				 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("calling shotgun function"));
-				 shotgunClass->WeaponAbility();
+				 shotgunClass->WeaponAbility(Mesh1P, weapon);
 			 }
 			 if (rifleClass) {
 				 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Purple, TEXT("calling rifle function"));
@@ -284,7 +278,7 @@ void AFPS_205Character::Shooting()
 			 }
 			 if (pistolClass) {
 				 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("calling pistol function"));
-				 pistolClass->WeaponAbility();
+				 pistolClass->WeaponAbility(Mesh1P, weapon);
 			 }
 			 
 		 }
@@ -293,9 +287,48 @@ void AFPS_205Character::Shooting()
 			 {
 				 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Ability Reset"));
 				 canFireAbility = true;
-			 }, 15.f, false);
-	 }
+			 }, weapon.abilityCooldown, false);
+	 } 
 
+ }
+
+ bool AFPS_205Character::makeTrace()
+ {
+
+	 FVector StartLoc = FirstPersonCameraComponent->GetComponentLocation();
+	 FVector ForwardVector = FirstPersonCameraComponent->GetForwardVector();
+	 FVector EndLoc = ((ForwardVector * 5000.f) + StartLoc);
+	
+
+	 bool TraceHit = GetWorld()->LineTraceSingleByChannel(TraceResult, StartLoc, EndLoc, ECC_Visibility);
+
+
+	 return TraceHit;
+ }
+
+ void AFPS_205Character::makeMuzzle(float aimLoc)
+ {
+	 if (specificWeapon->gunMuzzle) {
+
+
+		 FVector modifyAim = BoxAim->GetComponentLocation() + BoxAim->GetRightVector() * aimLoc;
+
+		 ARifle* rifleClass = Cast<ARifle>(Weapon->GetChildActor());
+		 if (rifleClass) {
+			 if (rifleClass->multiShot && !rifleClass->multiShotFired) {
+				
+				 rifleClass->activateMultiShot(Mesh1P);
+			 }
+		
+		 }
+		
+
+
+			 UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), specificWeapon->gunMuzzle, modifyAim, BoxAim->GetForwardVector().Rotation(), FVector(1),
+				 true, true, ENCPoolMethod::AutoRelease, true);
+		 
+
+	 }
  }
  
  

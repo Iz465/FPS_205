@@ -4,9 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "WeaponsStruct.h"
 #include "Shotgun.generated.h"
 
 class UStaticMeshComponent;
+class UPlayer_AnimInstance;
+class USkeletalMeshComponent;
+class AFPS_205Character;
+//TArray WeaponsArray;
 
 UCLASS()
 class FPS_205_API AShotgun : public AActor
@@ -26,6 +31,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* Shotgun;
-	virtual void WeaponAbility();
+	UPlayer_AnimInstance* playerAnimInstance; 
+	virtual void WeaponAbility(USkeletalMeshComponent* playerMesh, const WeaponsStruct& shotgunWeapon);
+	FTimerHandle rapidfireTimer;
+	bool fireAbility = true;
+	AFPS_205Character* player;
+	int count = 0;
+	float delay;
 
 };

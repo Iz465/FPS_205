@@ -4,9 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "WeaponsStruct.h"
 #include "Pistol.generated.h"
 
-UStaticMeshComponent;
+class UStaticMeshComponent;
+class USkeletalMeshComponent;
 
 UCLASS()
 class FPS_205_API APistol : public AActor
@@ -26,6 +28,6 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	UStaticMeshComponent* Pistol;
-	virtual void WeaponAbility();
+	virtual void WeaponAbility(USkeletalMeshComponent* playerMesh, WeaponsStruct& pistolWeapon);
 
 };

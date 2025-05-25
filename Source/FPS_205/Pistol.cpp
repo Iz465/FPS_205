@@ -4,6 +4,7 @@
 #include "Pistol.h"
 #include "WeaponsStruct.h"
 #include "NiagaraSystem.h"
+#include "FPS_205Character.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/StaticMeshComponent.h"
 
@@ -23,6 +24,7 @@ APistol::APistol()
 		Pistol->SetRelativeRotation(FRotator(0, -90, 0));
 		Pistol->SetWorldScale3D(FVector(.5, .5, .5));
 		
+		
 		WeaponsStruct PistolWeapon;
 		PistolWeapon.name = "Pistol";
 		PistolWeapon.fireRate = 0.5f; 
@@ -38,6 +40,7 @@ APistol::APistol()
 		PistolWeapon.gunMuzzle = LoadObject<UNiagaraSystem>(nullptr, TEXT("/Game/MuzzleFlash/MuzzleFlash/Niagara/NS_Rifle_Flash.NS_Rifle_Flash"));
 		PistolWeapon.bloodScale = FVector(3, 3, 3);
 		PistolWeapon.weaponAbility = "TestAbility";
+		PistolWeapon.abilityCooldown = 15.f;
 		PistolWeapon.isEquipped = false;
 
 		bool checkArray = false;
@@ -69,9 +72,28 @@ void APistol::Tick(float DeltaTime)
 
 }
 
-void APistol::WeaponAbility()
+void APistol::WeaponAbility(USkeletalMeshComponent* playerMesh, WeaponsStruct& PistolWeapon)
 {
+	//	pistolWeapon.gunMuzzle = 
+	AFPS_205Character* player = Cast<AFPS_205Character>(playerMesh->GetOwner());
+
+	if (player) {
+
+		PistolWeapon.gunMuzzle = LoadObject<UNiagaraSystem>(nullptr,
+			TEXT("/Game/MsvFx_Niagara_Explosion_Pack_01/Prefabs/Revamped_Explosions/Niagara_Splash_Flame_02.Niagara_Splash_Flame_02"));
+		PistolWeapon.gunSound = LoadObject<USoundWave>(nullptr,
+			TEXT("/Script/Engine.SoundWave'/Game/Sounds/Gun_Sounds/gun-shot-1-176892.gun-shot-1-176892'"));
+
+		player->Shooting(true);
+		GEngine->AddOnScreenDebugMessage(-1, 5.F, FColor::Magenta, TEXT("Pistol bomb"));
+
+		PistolWeapon.gunMuzzle = LoadObject<UNiagaraSystem>(nullptr, TEXT("/Game/MuzzleFlash/MuzzleFlash/Niagara/NS_Rifle_Flash.NS_Rifle_Flash"));
+		PistolWeapon.gunSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Sounds/Gun_Sounds/pistol_gun_sound.pistol_gun_sound"));
+
+
+	}
 }
+
 
 
 

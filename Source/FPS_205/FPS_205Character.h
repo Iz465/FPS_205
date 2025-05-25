@@ -105,7 +105,8 @@ public:
 	UChildActorComponent* Weapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBoxComponent* BoxAim; 
-	void Shooting();
+	void Shooting(bool abilityFire);
+	void ShootingInput();
 	void EquipShotgun();
 	void EquipRifle();
 	void EquipPistol();
@@ -113,15 +114,15 @@ public:
 	bool canFire = true;
 	bool canFireAbility = true;
 	FTimerHandle GunWait;
-	FTimerHandle ShotgunWait;
-	FTimerHandle RifleWait;
-	FTimerHandle PistolWait;
 	FTimerHandle AbilityWait;
+	FHitResult TraceResult;
 	const WeaponsStruct* specificWeapon;
 	UPlayer_AnimInstance* PlayerAnimInstance;
 	UWeaponsActorComponent* WeaponsActorComponent;
 	UFUNCTION(BlueprintCallable)
 	void EquipGun(UClass* GunClass, FString weaponName);
 	void CastAbility();
+	bool makeTrace();
+	void makeMuzzle(float aimLoc);
 
 };
