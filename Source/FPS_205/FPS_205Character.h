@@ -112,13 +112,17 @@ public:
 	void EquipPistol();
 	UPROPERTY(BlueprintReadOnly)
 	bool canFire = true;
+	UPROPERTY(BlueprintReadOnly)
 	bool canFireAbility = true;
 	FTimerHandle GunWait;
+	UPROPERTY(BlueprintReadOnly)
 	FTimerHandle AbilityWait;
 	FHitResult TraceResult;
 	const WeaponsStruct* specificWeapon;
 	UPlayer_AnimInstance* PlayerAnimInstance;
 	UWeaponsActorComponent* WeaponsActorComponent;
+	UPROPERTY(BlueprintReadOnly)
+	float timeLeft;
 	UFUNCTION(BlueprintCallable)
 	void EquipGun(UClass* GunClass, FString weaponName);
 	void CastAbility();

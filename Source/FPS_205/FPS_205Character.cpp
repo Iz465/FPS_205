@@ -114,6 +114,7 @@ void AFPS_205Character::BeginPlay()
 	for (WeaponsStruct& weapon : WeaponsArray) {
 		if (weapon.name == "Shotgun") {
 			weapon.isEquipped = true;
+			timeLeft = weapon.abilityCooldown;
 		}
 		else {
 			weapon.isEquipped = false;
@@ -244,6 +245,8 @@ void AFPS_205Character::ShootingInput()
 				 Weapon->SetRelativeRotation(weapon.weaponRot);
 				 Mesh1P->SetRelativeLocation(weapon.meshLoc); 
 				 Mesh1P->SetRelativeRotation(weapon.meshRot);
+
+				 timeLeft = weapon.abilityCooldown;
 					
 				 // switches weapon animation to corresponding weapon.
 				 if (EWeaponsEnum* EnumWeapon = WeaponsActorComponent->WeaponMap.Find(weaponName)) 
