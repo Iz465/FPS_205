@@ -128,5 +128,7 @@ public:
 	void CastAbility();
 	bool makeTrace();
 	void makeMuzzle(float aimLoc);
-
+	UPROPERTY(BlueprintReadWrite)
+	float volumeLevel{ 10 };
+	
 };
