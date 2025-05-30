@@ -25,6 +25,7 @@
 #include "GeometryCache.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/LocalPlayer.h"
+#include "MyGameInstance.h"
 #include "Pistol.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -120,6 +121,20 @@ void AFPS_205Character::BeginPlay()
 			weapon.isEquipped = false;
 		}
 	}
+
+	UMyGameInstance* GameInstance = Cast<UMyGameInstance>(GetGameInstance());
+	if (GameInstance) {
+		float volume = GameInstance->GlobalVolume;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, FString::SanitizeFloat(volume));
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, TEXT("ERROR ERROR ERROR"));
+	}
+
+/*	UGlobalGameInstance* gameInstance = Cast<UGlobalGameInstance>(GetGameInstance());
+	float volume = gameInstance->GlobalVolume;
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, FString::SanitizeFloat(volume));
+	 */
 
 
 }
