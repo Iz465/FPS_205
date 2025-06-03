@@ -4,6 +4,8 @@
 #include "GunCameraShake.h"
 #include "FPS_205Projectile.h"
 #include "WeaponsStruct.h"
+#include "Shotgun.h"
+#include "Rifle.h"
 #include "WeaponsActorComponent.h"
 #include "Animation/AnimInstance.h"
 #include "Player_AnimInstance.h"
@@ -23,6 +25,8 @@
 #include "GeometryCache.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/LocalPlayer.h"
+#include "MyGameInstance.h"
+#include "Pistol.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -48,7 +52,7 @@ AFPS_205Character::AFPS_205Character()
 		Mesh1P->SetOnlyOwnerSee(true);
 		Mesh1P->SetupAttachment(FirstPersonCameraComponent);
 		Mesh1P->bCastDynamicShadow = false;
-		Mesh1P->CastShadow = false;
+		Mesh1P->CastShadow = false;  
 		Mesh1P->SetRelativeLocation(FVector(-15.656140, 17.940820, -147.398974));
 		Mesh1P->SetRelativeRotation(FRotator(-0.000000, -19.783628, 0.000000));
 		
@@ -111,11 +115,26 @@ void AFPS_205Character::BeginPlay()
 	for (WeaponsStruct& weapon : WeaponsArray) {
 		if (weapon.name == "Shotgun") {
 			weapon.isEquipped = true;
+			timeLeft = weapon.abilityCooldown;
 		}
 		else {
 			weapon.isEquipped = false;
 		}
 	}
+
+	UMyGameInstance* GameInstance = Cast<UMyGameInstance>(GetGameInstance());
+	if (GameInstance) {
+		float volume = GameInstance->GlobalVolume;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, FString::SanitizeFloat(volume));
+	}
+	else {
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, TEXT("ERROR ERROR ERROR"));
+	}
+
+/*	UGlobalGameInstance* gameInstance = Cast<UGlobalGameInstance>(GetGameInstance());
+	float volume = gameInstance->GlobalVolume;
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, FString::SanitizeFloat(volume));
+	 */
 
 
 }
@@ -136,7 +155,7 @@ void AFPS_205Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AFPS_205Character::Look);
 
 		//// Shooting 
-		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AFPS_205Character::Shooting);
+		EnhancedInputComponent->BindAction(ShootAction, ETriggerEvent::Triggered, this, &AFPS_205Character::ShootingInput);
 
 		//Shotgun
 		EnhancedInputComponent->BindAction(ShotgunAction, ETriggerEvent::Started, this, &AFPS_205Character::EquipShotgun);
@@ -146,6 +165,9 @@ void AFPS_205Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		//Pistol 
 		EnhancedInputComponent->BindAction(PistolAction, ETriggerEvent::Started, this, &AFPS_205Character::EquipPistol);
+
+		// Weapon Ability
+		EnhancedInputComponent->BindAction(WeaponAbilityAction, ETriggerEvent::Started, this, &AFPS_205Character::CastAbility);
 
 	
 	}
@@ -157,11 +179,10 @@ void AFPS_205Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 
 // All gun things are played here like the sound, the animation, the recoil etc.
-void AFPS_205Character::Shooting()
+void AFPS_205Character::Shooting(bool abilityFire)
 {
-	
+	if (abilityFire == true) canFire = true;
 	if (!canFire) return;
-
 		canFire = false;
 
 		for (const WeaponsStruct& weapon : WeaponsArray) {
@@ -179,12 +200,7 @@ void AFPS_205Character::Shooting()
 			PlayerAnimInstance->SetupRecoil(specificWeapon->recoilLoc, specificWeapon->recoilRot);
 			
 
-			FVector StartLoc = BoxAim->GetComponentLocation();
-			FVector ForwardVector = BoxAim->GetForwardVector();
-			FVector EndLoc = ((ForwardVector * 5000.f) + StartLoc);
-			FHitResult TraceResult;
-		
-			bool TraceHit = GetWorld()->LineTraceSingleByChannel(TraceResult, StartLoc, EndLoc, ECC_Visibility);
+			bool TraceHit = makeTrace();
 
 			if (TraceHit) {
 		
@@ -192,8 +208,9 @@ void AFPS_205Character::Shooting()
 				AActor* ActorHit = TraceResult.GetActor();
 				if (ActorHit)
 				{
-					UGeometryCache* BloodCache = LoadObject<UGeometryCache>(nullptr, TEXT("/Game/Blood_Splatter_03.Blood_Splatter_03"));
-					if (BloodCache)
+				//	UGeometryCache* BloodCache = LoadObject<UGeometryCache>(nullptr, TEXT("/Game/Blood_Splatter_03.Blood_Splatter_03"));
+
+					/*if (BloodCache)
 					{
 						FVector bloodLocation = TraceResult.ImpactPoint;
 						FRotator bloodRotation = TraceResult.ImpactNormal.Rotation();
@@ -203,15 +220,13 @@ void AFPS_205Character::Shooting()
 						BloodSplatter->GetGeometryCacheComponent()->Play();
 						BloodSplatter->SetActorScale3D(specificWeapon->bloodScale);
 						BloodSplatter->SetLifeSpan(.5f);
-					}
+					} */
 				}
 			}
+
 			UGameplayStatics::PlaySoundAtLocation(GetWorld(), specificWeapon->gunSound, BoxAim->GetComponentLocation());
 
-			if (specificWeapon->gunMuzzle) {
-				UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), specificWeapon->gunMuzzle, BoxAim->GetComponentLocation(), BoxAim->GetForwardVector().Rotation(), FVector(1),
-					true, true, ENCPoolMethod::AutoRelease, true);
-			}
+			makeMuzzle(0);
 
 			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(UGunCameraShake::StaticClass(), specificWeapon->CamShakeScale);
 
@@ -221,30 +236,37 @@ void AFPS_205Character::Shooting()
 					canFire = true;
 				}, specificWeapon->fireRate, false);	
 }
+
+
+void AFPS_205Character::ShootingInput()
+{
+	Shooting(false);
+}
  
-
-
-
-
 
 
  void AFPS_205Character::EquipGun(UClass* GunClass, FString weaponName) {
 	 
 	 if (!GunClass) return;
 
-		 canFire = true;
 		 Weapon->SetChildActorClass(GunClass);
 
-		 for (WeaponsStruct& weapon : WeaponsArray) {
-			 if (weapon.name == weaponName) {
+		 for (WeaponsStruct& weapon : WeaponsArray) 
+		 {
+			 if (weapon.name == weaponName) 
+			 {
 				 weapon.isEquipped = true;
 
 				 Weapon->SetRelativeLocation(weapon.weaponLoc);
 				 Weapon->SetRelativeRotation(weapon.weaponRot);
 				 Mesh1P->SetRelativeLocation(weapon.meshLoc); 
 				 Mesh1P->SetRelativeRotation(weapon.meshRot);
-	
-				 if (EWeaponsEnum* EnumWeapon = WeaponsActorComponent->WeaponMap.Find(weaponName)) {
+
+				 timeLeft = weapon.abilityCooldown;
+					
+				 // switches weapon animation to corresponding weapon.
+				 if (EWeaponsEnum* EnumWeapon = WeaponsActorComponent->WeaponMap.Find(weaponName)) 
+				 {
 					 WeaponsActorComponent->CurrentWeapon = *EnumWeapon;
 				 }
 			 }
@@ -254,6 +276,79 @@ void AFPS_205Character::Shooting()
 			 }
 		 }
 	 }
+
+ void AFPS_205Character::CastAbility()
+ { 
+	 if (!canFireAbility) return;
+	 canFireAbility = false;
+	 for (WeaponsStruct& weapon : WeaponsArray) {
+		 if (weapon.isEquipped == true) {
+			 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, weapon.weaponAbility);
+			 AShotgun* shotgunClass = Cast<AShotgun>(Weapon->GetChildActor());
+			 ARifle* rifleClass = Cast<ARifle>(Weapon->GetChildActor());
+			 APistol* pistolClass = Cast<APistol>(Weapon->GetChildActor());
+			 if (shotgunClass) {
+				 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("calling shotgun function"));
+				 shotgunClass->WeaponAbility(Mesh1P, weapon);
+			 }
+			 if (rifleClass) {
+				 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Purple, TEXT("calling rifle function"));
+				 rifleClass->WeaponAbility();
+			 }
+			 if (pistolClass) {
+				 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Orange, TEXT("calling pistol function"));
+				 pistolClass->WeaponAbility(Mesh1P, weapon);
+			 }
+			 
+		 }
+	
+		 GetWorldTimerManager().SetTimer(AbilityWait, [this]()
+			 {
+				 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Ability Reset"));
+				 canFireAbility = true;
+			 }, weapon.abilityCooldown, false);
+	 } 
+
+ }
+
+ bool AFPS_205Character::makeTrace()
+ {
+
+	 FVector StartLoc = FirstPersonCameraComponent->GetComponentLocation();
+	 FVector ForwardVector = FirstPersonCameraComponent->GetForwardVector();
+	 FVector EndLoc = ((ForwardVector * 5000.f) + StartLoc);
+	
+
+	 bool TraceHit = GetWorld()->LineTraceSingleByChannel(TraceResult, StartLoc, EndLoc, ECC_Visibility);
+
+
+	 return TraceHit;
+ }
+
+ void AFPS_205Character::makeMuzzle(float aimLoc)
+ {
+	 if (specificWeapon->gunMuzzle) {
+
+
+		 FVector modifyAim = BoxAim->GetComponentLocation() + BoxAim->GetRightVector() * aimLoc;
+
+		 ARifle* rifleClass = Cast<ARifle>(Weapon->GetChildActor());
+		 if (rifleClass) {
+			 if (rifleClass->multiShot && !rifleClass->multiShotFired) {
+				
+				 rifleClass->activateMultiShot(Mesh1P);
+			 }
+		
+		 }
+		
+
+
+			 UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), specificWeapon->gunMuzzle, modifyAim, BoxAim->GetForwardVector().Rotation(), FVector(1),
+				 true, true, ENCPoolMethod::AutoRelease, true);
+		 
+
+	 }
+ }
  
  
 void AFPS_205Character::EquipShotgun()
@@ -289,16 +384,9 @@ void AFPS_205Character::Move(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
-
 		// add movement 
 		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
-		AddMovementInput(GetActorRightVector(), MovementVector.X);
-		
-		/*UPlayer_AnimInstance* playerAnim = Cast<UPlayer_AnimInstance>(GetMesh1P()->GetAnimInstance());
-		if (playerAnim) {
-			playerAnim->GunMovementSway(GetMesh1P());
-		} */
-		
+		AddMovementInput(GetActorRightVector(), MovementVector.X);	
 	}
 }
 

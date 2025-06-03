@@ -60,17 +60,22 @@ class AFPS_205Character : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* ShotgunAction;
 
-	/** Shotgun Input Action */
+	/** Rifle Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* RifleAction;
 
-	/** Shotgun Input Action */
+	/** Pistol Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* PistolAction;
 
-	/** Shotgun Input Action */
+	/** Airgun Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* AirGunAction;
+
+	/** Weapon Ability Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	class UInputAction* WeaponAbilityAction;
+
 
 
 	
@@ -100,17 +105,30 @@ public:
 	UChildActorComponent* Weapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UBoxComponent* BoxAim; 
-	void Shooting();
+	void Shooting(bool abilityFire);
+	void ShootingInput();
 	void EquipShotgun();
 	void EquipRifle();
 	void EquipPistol();
 	UPROPERTY(BlueprintReadOnly)
 	bool canFire = true;
+	UPROPERTY(BlueprintReadOnly)
+	bool canFireAbility = true;
 	FTimerHandle GunWait;
+	UPROPERTY(BlueprintReadOnly)
+	FTimerHandle AbilityWait;
+	FHitResult TraceResult;
 	const WeaponsStruct* specificWeapon;
 	UPlayer_AnimInstance* PlayerAnimInstance;
 	UWeaponsActorComponent* WeaponsActorComponent;
+	UPROPERTY(BlueprintReadOnly)
+	float timeLeft;
 	UFUNCTION(BlueprintCallable)
 	void EquipGun(UClass* GunClass, FString weaponName);
-
+	void CastAbility();
+	bool makeTrace();
+	void makeMuzzle(float aimLoc);
+	UPROPERTY(BlueprintReadWrite)
+	float volumeLevel{ 10 };
+	
 };
