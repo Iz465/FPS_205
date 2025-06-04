@@ -107,8 +107,11 @@ public:
 	UBoxComponent* BoxAim; 
 	void Shooting(bool abilityFire);
 	void ShootingInput();
+	UFUNCTION(BlueprintCallable)
 	void EquipShotgun();
+	UFUNCTION(BlueprintCallable)
 	void EquipRifle();
+	UFUNCTION(BlueprintCallable)
 	void EquipPistol();
 	UPROPERTY(BlueprintReadOnly)
 	bool canFire = true;
