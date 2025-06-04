@@ -208,9 +208,11 @@ void AFPS_205Character::Shooting(bool abilityFire)
 				AActor* ActorHit = TraceResult.GetActor();
 				if (ActorHit)
 				{
-				//	UGeometryCache* BloodCache = LoadObject<UGeometryCache>(nullptr, TEXT("/Game/Blood_Splatter_03.Blood_Splatter_03"));
+					checkActorHit(specificWeapon->weaponDamage);
 
-					/*if (BloodCache)
+					UGeometryCache* BloodCache = LoadObject<UGeometryCache>(nullptr, TEXT("/Game/Blood_Splatter_03.Blood_Splatter_03"));
+
+					if (BloodCache)
 					{
 						FVector bloodLocation = TraceResult.ImpactPoint;
 						FRotator bloodRotation = TraceResult.ImpactNormal.Rotation();
@@ -220,7 +222,7 @@ void AFPS_205Character::Shooting(bool abilityFire)
 						BloodSplatter->GetGeometryCacheComponent()->Play();
 						BloodSplatter->SetActorScale3D(specificWeapon->bloodScale);
 						BloodSplatter->SetLifeSpan(.5f);
-					} */
+					} 
 				}
 			}
 
@@ -349,7 +351,8 @@ void AFPS_205Character::ShootingInput()
 
 	 }
  }
- 
+
+
  
 void AFPS_205Character::EquipShotgun()
 {

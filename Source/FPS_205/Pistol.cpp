@@ -28,6 +28,7 @@ APistol::APistol()
 		WeaponsStruct PistolWeapon;
 		PistolWeapon.name = "Pistol";
 		PistolWeapon.fireRate = 0.5f; 
+		PistolWeapon.weaponDamage = 25.f;
 		PistolWeapon.recoilRate = 1.f; 
 		PistolWeapon.recoilLoc = FVector(PistolWeapon.recoilRate * -30, PistolWeapon.recoilRate * -5, 0);
 		PistolWeapon.recoilRot = FRotator(PistolWeapon.recoilRate * 25, 0, 0);
@@ -83,12 +84,13 @@ void APistol::WeaponAbility(USkeletalMeshComponent* playerMesh, WeaponsStruct& P
 			TEXT("/Game/MsvFx_Niagara_Explosion_Pack_01/Prefabs/Revamped_Explosions/Niagara_Splash_Flame_02.Niagara_Splash_Flame_02"));
 		PistolWeapon.gunSound = LoadObject<USoundWave>(nullptr,
 			TEXT("/Script/Engine.SoundWave'/Game/Sounds/Gun_Sounds/gun-shot-1-176892.gun-shot-1-176892'"));
-
+		PistolWeapon.weaponDamage = 150.f;
 		player->Shooting(true);
 		GEngine->AddOnScreenDebugMessage(-1, 5.F, FColor::Magenta, TEXT("Pistol bomb"));
 
 		PistolWeapon.gunMuzzle = LoadObject<UNiagaraSystem>(nullptr, TEXT("/Game/MuzzleFlash/MuzzleFlash/Niagara/NS_Rifle_Flash.NS_Rifle_Flash"));
 		PistolWeapon.gunSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Sounds/Gun_Sounds/pistol_gun_sound.pistol_gun_sound"));
+		PistolWeapon.weaponDamage = 20.f;
 
 
 	}
@@ -96,13 +98,3 @@ void APistol::WeaponAbility(USkeletalMeshComponent* playerMesh, WeaponsStruct& P
 
 
 
-
-/*
-* 
-* old rotation/ location in case i want to switch back to this one.
-	PistolWeapon.weaponLoc = FVector(-65.756018, 1.757550, -31.527866);
-		PistolWeapon.weaponRot = FRotator(23.375090, 107.144062, -12.869051);
-		PistolWeapon.meshLoc = FVector(-33.758897, 35.569133, -142.992237);
-		PistolWeapon.meshRot = FRotator(0.897862, -6.448737, 0.776268);
-
-*/

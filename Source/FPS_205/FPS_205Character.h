@@ -117,6 +117,7 @@ public:
 	FTimerHandle GunWait;
 	UPROPERTY(BlueprintReadOnly)
 	FTimerHandle AbilityWait;
+	UPROPERTY(BlueprintReadOnly)
 	FHitResult TraceResult;
 	const WeaponsStruct* specificWeapon;
 	UPlayer_AnimInstance* PlayerAnimInstance;
@@ -128,6 +129,8 @@ public:
 	void CastAbility();
 	bool makeTrace();
 	void makeMuzzle(float aimLoc);
+	UFUNCTION(BlueprintImplementableEvent)
+	void checkActorHit(const float weaponDamage);
 	UPROPERTY(BlueprintReadWrite)
 	float volumeLevel{ 10 };
 	

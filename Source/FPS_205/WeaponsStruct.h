@@ -14,6 +14,7 @@ struct FPS_205_API WeaponsStruct
 {  // add uproperty to them.
 	FString name;
 	float fireRate;
+	float weaponDamage;
 	float recoilRate;
 	float abilityCooldown;
 	FVector recoilLoc;

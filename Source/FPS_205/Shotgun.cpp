@@ -30,6 +30,7 @@ AShotgun::AShotgun()
 	WeaponsStruct shotgunWeapon;
 	shotgunWeapon.name = "Shotgun";
 	shotgunWeapon.fireRate = 1.5f;
+	shotgunWeapon.weaponDamage = 100.f;
 	shotgunWeapon.recoilRate = 1.5f;
 	shotgunWeapon.recoilLoc = FVector(shotgunWeapon.recoilRate * -30, shotgunWeapon.recoilRate * -5, 0);
 	shotgunWeapon.recoilRot = FRotator(shotgunWeapon.recoilRate * 25, 0, 0);

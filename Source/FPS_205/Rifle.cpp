@@ -30,6 +30,7 @@ ARifle::ARifle()
 	WeaponsStruct rifleWeapon;
 	rifleWeapon.name = "Rifle";
 	rifleWeapon.fireRate = .2f;
+	rifleWeapon.weaponDamage = 15.f;
 	rifleWeapon.recoilRate = 0.6f;
 	rifleWeapon.recoilLoc = FVector(rifleWeapon.recoilRate * -20, rifleWeapon.recoilRate * -5, 0);
 	rifleWeapon.recoilRot = FRotator(rifleWeapon.recoilRate * - 10, 0, 0);
