@@ -19,6 +19,8 @@ class UPlayer_AnimInstance;
 class ARifle;
 class UNiagaraSystem;
 class UWeaponsActorComponent;
+class UParticleSystem;
+class USoundWave;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -125,6 +127,9 @@ public:
 	const WeaponsStruct* specificWeapon;
 	UPlayer_AnimInstance* PlayerAnimInstance;
 	UWeaponsActorComponent* WeaponsActorComponent;
+	UParticleSystem* floorShotParticle;
+	UParticleSystem* bloodParticle;
+	USoundWave* hitSound;
 	UPROPERTY(BlueprintReadOnly)
 	float timeLeft;
 	UFUNCTION(BlueprintCallable)
@@ -136,5 +141,9 @@ public:
 	void checkActorHit(const float weaponDamage);
 	UPROPERTY(BlueprintReadWrite)
 	float volumeLevel{ 10 };
+	UFUNCTION(BlueprintCallable)
+	void bloodHit();
+	UFUNCTION(BlueprintCallable)
+	void floorHit();
 	
 };

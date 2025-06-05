@@ -6,9 +6,11 @@
 #include "WeaponsStruct.h"
 #include "Shotgun.h"
 #include "Rifle.h"
+
 #include "WeaponsActorComponent.h"
 #include "Animation/AnimInstance.h"
 #include "Player_AnimInstance.h"
+#include "Particles/ParticleSystem.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -207,24 +209,9 @@ void AFPS_205Character::Shooting(bool abilityFire)
 				// if an actor is hit, then the blood splatter will appear where the actor was hit.
 				AActor* ActorHit = TraceResult.GetActor();
 				if (ActorHit)
-				{
 					checkActorHit(specificWeapon->weaponDamage);
-
-					UGeometryCache* BloodCache = LoadObject<UGeometryCache>(nullptr, TEXT("/Game/Blood_Splatter_03.Blood_Splatter_03"));
-
-					if (BloodCache)
-					{
-						FVector bloodLocation = TraceResult.ImpactPoint;
-						FRotator bloodRotation = TraceResult.ImpactNormal.Rotation();
-
-						AGeometryCacheActor* BloodSplatter = GetWorld()->SpawnActor<AGeometryCacheActor>(bloodLocation, bloodRotation);
-						BloodSplatter->GetGeometryCacheComponent()->SetGeometryCache(BloodCache);
-						BloodSplatter->GetGeometryCacheComponent()->Play();
-						BloodSplatter->SetActorScale3D(specificWeapon->bloodScale);
-						BloodSplatter->SetLifeSpan(.5f);
-					} 
-				}
-			}
+				
+			} 
 
 			UGameplayStatics::PlaySoundAtLocation(GetWorld(), specificWeapon->gunSound, BoxAim->GetComponentLocation());
 
@@ -350,6 +337,35 @@ void AFPS_205Character::ShootingInput()
 		 
 
 	 }
+ }
+
+ void AFPS_205Character::bloodHit()
+ {
+	 bloodParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/Realistic_Starter_VFX_Pack_Vol2/Particles/Blood/P_Blood_Splat_Cone.P_Blood_Splat_Cone"));
+	 hitSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Sounds/Flesh_Sounds/Bullet_Hitting_Flesh_finished.Bullet_Hitting_Flesh_finished"));
+
+	 if (bloodParticle) {
+		 FVector BloodDirection = GetActorLocation() - TraceResult.ImpactPoint;
+		 FRotator BloodRotation = BloodDirection.Rotation();
+		 UGameplayStatics::SpawnEmitterAtLocation(this, bloodParticle, TraceResult.ImpactPoint, BloodRotation);
+	 }
+
+	 if (hitSound)
+		 UGameplayStatics::PlaySoundAtLocation(this, hitSound, TraceResult.ImpactPoint);
+	
+ }
+
+ void AFPS_205Character::floorHit()
+ {
+	
+	 hitSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Sounds/Metal_Sounds/metal-hit-11-193277.metal-hit-11-193277"));
+	 floorShotParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/Realistic_Starter_VFX_Pack_Vol2/Particles/Hit/P_Ceramic.P_Ceramic"));
+
+	 if (floorShotParticle) 
+		 UGameplayStatics::SpawnEmitterAtLocation(this, floorShotParticle, TraceResult.ImpactPoint);
+	 if (hitSound)
+		 UGameplayStatics::PlaySoundAtLocation(this, hitSound, TraceResult.ImpactPoint);
+	 
  }
 
 
