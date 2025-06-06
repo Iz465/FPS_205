@@ -133,11 +133,6 @@ void AFPS_205Character::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, TEXT("ERROR ERROR ERROR"));
 	}
 
-/*	UGlobalGameInstance* gameInstance = Cast<UGlobalGameInstance>(GetGameInstance());
-	float volume = gameInstance->GlobalVolume;
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Silver, FString::SanitizeFloat(volume));
-	 */
-
 
 }
 
@@ -196,20 +191,19 @@ void AFPS_205Character::Shooting(bool abilityFire)
 
 		if (!specificWeapon) return;
 
-			PlayerAnimInstance = Cast<UPlayer_AnimInstance>(GetMesh1P()->GetAnimInstance());
-			if (!PlayerAnimInstance) return;
+		PlayerAnimInstance = Cast<UPlayer_AnimInstance>(GetMesh1P()->GetAnimInstance());
+		if (!PlayerAnimInstance) return;
 
-			PlayerAnimInstance->SetupRecoil(specificWeapon->recoilLoc, specificWeapon->recoilRot);
+		PlayerAnimInstance->SetupRecoil(specificWeapon->recoilLoc, specificWeapon->recoilRot);
 			
+		bool TraceHit = makeTrace();
 
-			bool TraceHit = makeTrace();
-
-			if (TraceHit) {
+		if (TraceHit) {
 		
-				// if an actor is hit, then the blood splatter will appear where the actor was hit.
-				AActor* ActorHit = TraceResult.GetActor();
-				if (ActorHit)
-					checkActorHit(specificWeapon->weaponDamage);
+			// if an actor is hit, vfx will appear at location.
+			AActor* ActorHit = TraceResult.GetActor();
+			if (ActorHit)
+				checkActorHit(specificWeapon->weaponDamage); 
 				
 			} 
 
