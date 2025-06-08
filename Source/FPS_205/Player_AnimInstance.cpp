@@ -46,18 +46,18 @@ void UPlayer_AnimInstance::ImplementRecoil(float deltaTime)
 // Called in BP
 void UPlayer_AnimInstance::SetupGunSway()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Blue, TEXT("Gun Sway Updating"));
+	//GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Blue, TEXT("Gun Sway Updating"));
 	// need to make this the same regardless of frames.
 	gunSwaySpeed += 0.003;
 
 	float locZ = FMath::Lerp(gunSwayLocZ, finalGunSwayLocZ, gunSwaySpeed);
 	float rotX = FMath::Lerp(gunSwayRotX, finalGunSwayRotX, gunSwaySpeed);
 	float rotZ = FMath::Lerp(gunSwayRotZ, finalGunSwayRotZ, gunSwaySpeed);
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Blue, FString::SanitizeFloat(locZ));
+	//GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Blue, FString::SanitizeFloat(locZ));
 
 	// Starts the gun sway
 	if (!resetTransform) {
-		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Blue, TEXT("Reset False"));
+	//	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Blue, TEXT("Reset False"));
 		GunSwayTransform.SetLocation(FVector(0,0, locZ));
 		GunSwayTransform.SetRotation(FRotator(rotX, 0, rotZ).Quaternion());
 
@@ -81,7 +81,7 @@ void UPlayer_AnimInstance::SetupGunSway()
 
 	// This will reset the gun sway, making the gun go back to its original location
 	else {
-		GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Blue, TEXT("Reset True"));
+		//GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Blue, TEXT("Reset True"));
 		GunSwayTransform.SetLocation(FVector(0, 0, locZ));
 		GunSwayTransform.SetRotation(FRotator(rotX, 0, rotZ).Quaternion());
 
