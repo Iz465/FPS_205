@@ -266,10 +266,11 @@ void AFPS_205Character::ShootingInput()
 	 canFireAbility = false;
 	 for (WeaponsStruct& weapon : WeaponsArray) {
 		 if (weapon.isEquipped == true) {
-			 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Black, weapon.weaponAbility);
+
 			 AShotgun* shotgunClass = Cast<AShotgun>(Weapon->GetChildActor());
 			 ARifle* rifleClass = Cast<ARifle>(Weapon->GetChildActor());
 			 APistol* pistolClass = Cast<APistol>(Weapon->GetChildActor());
+
 			 if (shotgunClass) {
 				 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("calling shotgun function"));
 				 shotgunClass->WeaponAbility(Mesh1P, weapon);
@@ -287,7 +288,7 @@ void AFPS_205Character::ShootingInput()
 	
 		 GetWorldTimerManager().SetTimer(AbilityWait, [this]()
 			 {
-				 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Ability Reset"));
+				
 				 canFireAbility = true;
 			 }, weapon.abilityCooldown, false);
 	 } 
@@ -335,7 +336,8 @@ void AFPS_205Character::ShootingInput()
 
  void AFPS_205Character::bloodHit()
  {
-	 bloodParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/Realistic_Starter_VFX_Pack_Vol2/Particles/Blood/P_Blood_Splat_Cone.P_Blood_Splat_Cone"));
+	
+	 bloodParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/Realistic_Starter_VFX_Pack_Vol2/Particles/Blood/P_Blood_Splat_Cone_Quick.P_Blood_Splat_Cone_Quick"));
 	 hitSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Sounds/Flesh_Sounds/Bullet_Hitting_Flesh_finished.Bullet_Hitting_Flesh_finished"));
 
 	 if (bloodParticle) {
