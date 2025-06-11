@@ -40,12 +40,12 @@ AShotgun::AShotgun()
 	shotgunWeapon.meshRot = FRotator(-0.000000, -19.783628, 0.000000);
 	shotgunWeapon.gunSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Weapons/Shotgun/shotgun_fire_exported_sound.shotgun_fire_exported_sound"));
 	shotgunWeapon.CamShakeScale = 1.f; 
-	shotgunWeapon.gunMuzzle = LoadObject<UNiagaraSystem>(nullptr, TEXT("/Game/MuzzleFlash/MuzzleFlash/Niagara/NS_Shotgun_Flash.NS_Shotgun_Flash"));
+	shotgunWeapon.gunMuzzle = LoadObject<UNiagaraSystem>(nullptr, TEXT("/Game/Realistic_Starter_VFX_Pack_Vol2/Particles/Explosion/P_Explosion_Side_Converted.P_Explosion_Side_Converted"));
 	shotgunWeapon.bloodScale = FVector(6, 6, 6);
 	shotgunWeapon.weaponAbility = "RapidFire";
 	shotgunWeapon.abilityCooldown = 15.f;
 	shotgunWeapon.isEquipped = true;
-	
+
 	bool checkArray = false;
 
 

@@ -79,9 +79,9 @@ void APistol::WeaponAbility(USkeletalMeshComponent* playerMesh, WeaponsStruct& P
 	AFPS_205Character* player = Cast<AFPS_205Character>(playerMesh->GetOwner());
 
 	if (player) {
-
-		PistolWeapon.gunMuzzle = LoadObject<UNiagaraSystem>(nullptr,
-			TEXT("/Game/MsvFx_Niagara_Explosion_Pack_01/Prefabs/Revamped_Explosions/Niagara_Splash_Flame_02.Niagara_Splash_Flame_02"));
+		
+		PistolWeapon.gunMuzzle = LoadObject<UNiagaraSystem>(nullptr, 
+			TEXT("/Game/Realistic_Starter_VFX_Pack_Vol2/Particles/Explosion/P_Explosion_Side_Converted.P_Explosion_Side_Converted"));
 		PistolWeapon.gunSound = LoadObject<USoundWave>(nullptr,
 			TEXT("/Script/Engine.SoundWave'/Game/Sounds/Gun_Sounds/gun-shot-1-176892.gun-shot-1-176892'"));
 		PistolWeapon.weaponDamage = 150.f;
@@ -94,7 +94,7 @@ void APistol::WeaponAbility(USkeletalMeshComponent* playerMesh, WeaponsStruct& P
 
 
 	}
-}
+} 
 
 
 
