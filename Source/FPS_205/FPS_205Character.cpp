@@ -199,7 +199,7 @@ void AFPS_205Character::Shooting(bool abilityFire)
 		bool TraceHit = makeTrace();
 
 		if (TraceHit) {
-		
+			UE_LOG(LogTemp, Warning, TEXT(" Hit Actor: %s"), *TraceResult.GetActor()->GetName());
 			// if an actor is hit, vfx will appear at location.
 			AActor* ActorHit = TraceResult.GetActor();
 			if (ActorHit)
@@ -301,14 +301,13 @@ void AFPS_205Character::ShootingInput()
 	 FVector StartLoc = FirstPersonCameraComponent->GetComponentLocation();
 	 FVector ForwardVector = FirstPersonCameraComponent->GetForwardVector();
 	 FVector EndLoc = ((ForwardVector * 5000.f) + StartLoc);
-	
-
-	 bool TraceHit = GetWorld()->LineTraceSingleByChannel(TraceResult, StartLoc, EndLoc, ECC_Visibility);
-
-
+	 FCollisionQueryParams TraceParams;
+	 TraceParams.AddIgnoredActor(this);
+	 bool TraceHit = GetWorld()->LineTraceSingleByChannel(TraceResult, StartLoc, EndLoc, ECC_GameTraceChannel1, TraceParams);
+	 DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, false, 2.f, 0, 1.f);
 	 return TraceHit;
- }
-
+ } 
+	 //ECC_Visibility
  void AFPS_205Character::makeMuzzle(float aimLoc)
  {
 	 if (specificWeapon->gunMuzzle) {

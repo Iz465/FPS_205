@@ -40,7 +40,7 @@ void AEnemyParent::DeleteBodyParts(AActor* bodyPart)
         {
 			GEngine->AddOnScreenDebugMessage(01, 5.f, FColor::Silver, TEXT("Deleting body parts"));
             bodyPart->Destroy();
-        }, 60.f, false);
+        }, 30.f, false);
 
 	
 }
