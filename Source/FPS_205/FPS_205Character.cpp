@@ -335,8 +335,8 @@ void AFPS_205Character::ShootingInput()
 
  void AFPS_205Character::bloodHit()
  {
-	
-	 bloodParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/Realistic_Starter_VFX_Pack_Vol2/Particles/Blood/P_Blood_Splat_Cone_Quick_Blue.P_Blood_Splat_Cone_Quick_Blue"));
+
+	 bloodParticle = LoadObject<UParticleSystem>(nullptr, TEXT("/Game/Realistic_Starter_VFX_Pack_Vol2/Particles/Blood/P_Blood_Splat_Cone_Quick.P_Blood_Splat_Cone_Quick"));
 	 hitSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Sounds/Flesh_Sounds/Bullet_Hitting_Flesh_finished.Bullet_Hitting_Flesh_finished"));
 
 	 if (bloodParticle) {
