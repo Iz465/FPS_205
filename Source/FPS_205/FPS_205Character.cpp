@@ -304,7 +304,7 @@ void AFPS_205Character::ShootingInput()
 	 FCollisionQueryParams TraceParams;
 	 TraceParams.AddIgnoredActor(this);
 	 bool TraceHit = GetWorld()->LineTraceSingleByChannel(TraceResult, StartLoc, EndLoc, ECC_GameTraceChannel1, TraceParams);
-	 DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, false, 2.f, 0, 1.f);
+	// DrawDebugLine(GetWorld(), StartLoc, EndLoc, FColor::Green, false, 2.f, 0, 1.f);
 	 return TraceHit;
  } 
 	 //ECC_Visibility
